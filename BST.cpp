@@ -1,6 +1,7 @@
 #ifndef BST_CPP_T2K_10_17_2022
 #define BST_CPP_T2K_10_17_2022
 
+#include <iostream>
 #include "BST.h"
 
 BST::BST()
@@ -34,6 +35,7 @@ Node *BST::getRootNode() const
 
 /*
  * Attempts to add the given value to the BST tree
+ * Rebalances the tree if data is successfully added
  *
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
@@ -87,7 +89,7 @@ bool BST::addToSubtree(int data, Node *localRoot)
         return false;
     }
 
-    // AVL Tree: rebalance if necessary
+    // TODO Add() rebalancing
 }
 
 ////
@@ -96,6 +98,7 @@ bool BST::addToSubtree(int data, Node *localRoot)
 
 /**
  * @brief Attempts to remove the given value from the BST tree.
+ * Rebalances the tree if data is successfully removed
  *
  * @param data The value to remove.
  * @return true if successfully removed
@@ -104,6 +107,7 @@ bool BST::addToSubtree(int data, Node *localRoot)
 bool BST::remove(int data)
 {
     return removeFromSubtree(data, this->root);
+    // TODO Remove() rebalancing
 }
 
 /**
@@ -117,7 +121,6 @@ bool BST::remove(int data)
 bool BST::removeFromSubtree(int data, Node *&localRoot)
 {
     // Case 0: NULL
-    // TODO? Unneeded null check?
     if (localRoot == NULL)
     {
         return false;

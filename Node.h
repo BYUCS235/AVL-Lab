@@ -1,6 +1,7 @@
 #ifndef NODE_H_T2K_10_17_2022
 #define NODE_H_T2K_10_17_2022
 
+#include <string>
 #include "NodeInterface.h"
 
 struct Node : public NodeInterface
@@ -25,6 +26,7 @@ public:
     void setLeftChild(Node *left);
     void setRightChild(Node *right);
     std::string toString() const;
+    int getHeight();
 };
 
 #endif

@@ -2,10 +2,10 @@
 #define BST_H_T2K_10_17_2022
 
 #include <sstream>
-#include "BSTInterface.h"
+#include "AVLInterface.h"
 #include "Node.h"
 
-class BST : BSTInterface
+class BST : AVLInterface
 {
 private:
     Node *root;
