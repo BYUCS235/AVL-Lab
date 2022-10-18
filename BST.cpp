@@ -12,6 +12,7 @@ BST::BST()
 
 BST::~BST()
 {
+    clear();
     if (this->root)
     {
         delete this->root;

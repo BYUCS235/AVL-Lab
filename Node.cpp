@@ -13,7 +13,6 @@ Node::Node(int data, int id)
 
 Node::Node(int data, Node *leftChild, Node *rightChild, int id)
 {
-    // TODO
     this->data = data;
     this->id = id;
     this->leftChild = leftChild;
@@ -49,10 +48,6 @@ int Node::getData() const
  */
 Node *Node::getLeftChild() const
 {
-    if (this->leftChild == NULL) // TODO? Unneeded null check?
-    {
-        return NULL;
-    }
     return this->leftChild;
 }
 
@@ -63,17 +58,13 @@ Node *Node::getLeftChild() const
  */
 Node *Node::getRightChild() const
 {
-    if (this->rightChild == NULL) // TODO? Unneeded null check?
-    {
-        return NULL;
-    }
     return this->rightChild;
 }
 
-/*
- * Returns the left child of this node or null if it doesn't have one.
- *
- * @return the left child of this node or null if it doesn't have one.
+/**
+ * @brief Returns a reference to the left child of this node.
+ * Throws an error if it doesn't have one.
+ * @return Node*&
  */
 Node *&Node::getLeftChildRef()
 {
@@ -84,10 +75,10 @@ Node *&Node::getLeftChildRef()
     return this->leftChild;
 }
 
-/*
- * Returns the right child of this node or null if it doesn't have one.
- *
- * @return the right child of this node or null if it doesn't have one.
+/**
+ * @brief Returns a reference to the right child of this node.
+ * Throws an error if it doesn't have one.
+ * @return Node*&
  */
 Node *&Node::getRightChildRef()
 {
@@ -100,26 +91,12 @@ Node *&Node::getRightChildRef()
 
 void Node::setRightChild(Node *right)
 {
-    if (right == NULL) // TODO? Unneeded null check?
-    {
-        this->rightChild = NULL;
-    }
-    else
-    {
-        this->rightChild = right;
-    }
+    this->rightChild = right;
 }
 
 void Node::setLeftChild(Node *left)
 {
-    if (left == NULL) // TODO? Unneeded null check?
-    {
-        this->leftChild = NULL;
-    }
-    else
-    {
-        this->leftChild = left;
-    }
+    this->leftChild = left;
 }
 
 std::string Node::toString() const
