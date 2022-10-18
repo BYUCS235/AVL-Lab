@@ -6,6 +6,7 @@
 Node::Node(int data, int id)
 {
     this->data = data;
+    this->height = 1;
     this->id = id;
     this->leftChild = NULL;
     this->rightChild = NULL;
@@ -17,6 +18,19 @@ Node::Node(int data, Node *leftChild, Node *rightChild, int id)
     this->id = id;
     this->leftChild = leftChild;
     this->rightChild = rightChild;
+
+    this->height = 1;
+    if (leftChild != NULL)
+    {
+        setHeight(leftChild->getHeight() + 1);
+    }
+    if (rightChild != NULL)
+    {
+        if (rightChild->getHeight() + 1 > getHeight())
+        {
+            setHeight(rightChild->getHeight() + 1);
+        }
+    }
 }
 
 Node::~Node()
@@ -123,19 +137,19 @@ std::string Node::toString() const
     return str;
 }
 
-/*
- * Returns the height of this node. The height is the number of nodes
- * along the longest path from this node to a leaf.  While a conventional
- * interface only gives information on the functionality of a class and does
- * not comment on how a class should be implemented, this function has been
- * provided to point you in the right direction for your solution.  For an
- * example on height, see page 448 of the text book.
+/**
+ * @brief Returns the height of this node.
  *
- * @return the height of this tree with this node as the local root.
+ * @return int The height of this tree with this node as the local root.
  */
 int Node::getHeight()
 {
-    // TODO getHeight()
+    return this->height;
+}
+
+void Node::setHeight(int height)
+{
+    this->height = height;
 }
 
 #endif
