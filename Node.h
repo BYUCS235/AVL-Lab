@@ -11,7 +11,6 @@ private:
     Node *leftChild;
     Node *rightChild;
     int data;
-    int height;
     int id;
 
 public:
@@ -28,7 +27,6 @@ public:
     void setRightChild(Node *right);
     std::string toString() const;
     int getHeight();
-    void setHeight(int height);
 };
 
 #endif

@@ -6,7 +6,6 @@
 Node::Node(int data, int id)
 {
     this->data = data;
-    this->height = 1;
     this->id = id;
     this->leftChild = NULL;
     this->rightChild = NULL;
@@ -18,19 +17,6 @@ Node::Node(int data, Node *leftChild, Node *rightChild, int id)
     this->id = id;
     this->leftChild = leftChild;
     this->rightChild = rightChild;
-
-    this->height = 1;
-    if (leftChild != NULL)
-    {
-        setHeight(leftChild->getHeight() + 1);
-    }
-    if (rightChild != NULL)
-    {
-        if (rightChild->getHeight() + 1 > getHeight())
-        {
-            setHeight(rightChild->getHeight() + 1);
-        }
-    }
 }
 
 Node::~Node()
@@ -144,12 +130,27 @@ std::string Node::toString() const
  */
 int Node::getHeight()
 {
-    return this->height;
-}
+    // TODO Implement fast getHeight()
 
-void Node::setHeight(int height)
-{
-    this->height = height;
+    int rHeight = 1;
+    int lHeight = 1;
+
+    if (getLeftChild())
+    {
+        lHeight = getLeftChild()->getHeight() + 1;
+    }
+    if (getRightChild())
+    {
+        rHeight = getRightChild()->getHeight() + 1;
+    }
+    if (lHeight > rHeight)
+    {
+        return lHeight;
+    }
+    else
+    {
+        return rHeight;
+    }
 }
 
 #endif
