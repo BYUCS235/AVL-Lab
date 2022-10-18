@@ -13,7 +13,7 @@ private:
 
     void clearSubtree(Node *&localRoot);
     bool addToSubtree(int data, Node *localRoot);
-    bool removeFromSubtree(int data, Node *&localRoot);
+    int removeFromSubtree(int data, Node *&localRoot);
     Node *removeNode(Node *&localRoot);
     Node *removeNodeWith2Children(Node *&localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;

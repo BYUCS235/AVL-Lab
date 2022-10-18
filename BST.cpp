@@ -107,7 +107,8 @@ bool BST::addToSubtree(int data, Node *localRoot)
  */
 bool BST::remove(int data)
 {
-    return removeFromSubtree(data, this->root);
+    int result = removeFromSubtree(data, this->root);
+    return result != -1;
     // TODO Remove() rebalancing
 }
 
@@ -116,15 +117,16 @@ bool BST::remove(int data)
  *
  * @param data The value to remove.
  * @param localRoot The root of the subtree to search.
- * @return true if successfully removed
- * @return false if remove is unsuccessful (i.e. the value is not in the tree)
+ * @return 1 if successfully removed and heights further up should be updated
+ * @return 0 if successfully removed and heights further up should not be updated
+ * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
-bool BST::removeFromSubtree(int data, Node *&localRoot)
+int BST::removeFromSubtree(int data, Node *&localRoot)
 {
     // Case 0: NULL
     if (localRoot == NULL)
     {
-        return false;
+        return -1;
     }
 
     // Case 1: left subtree
@@ -132,7 +134,7 @@ bool BST::removeFromSubtree(int data, Node *&localRoot)
     {
         if (localRoot->getLeftChild() == NULL)
         {
-            return false;
+            return -1;
         }
         bool success = removeFromSubtree(data, localRoot->getLeftChildRef());
 
@@ -154,7 +156,7 @@ bool BST::removeFromSubtree(int data, Node *&localRoot)
     {
         if (localRoot->getRightChild() == NULL)
         {
-            return false;
+            return -1;
         }
         bool success = removeFromSubtree(data, localRoot->getRightChildRef());
         // TODO Update height
@@ -167,7 +169,7 @@ bool BST::removeFromSubtree(int data, Node *&localRoot)
         Node *temp = removeNode(localRoot);
         delete temp;
         // Update height
-        return true;
+        return 1;
     }
 }
 
