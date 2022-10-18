@@ -134,7 +134,19 @@ bool BST::removeFromSubtree(int data, Node *&localRoot)
         {
             return false;
         }
-        return removeFromSubtree(data, localRoot->getLeftChildRef());
+        bool success = removeFromSubtree(data, localRoot->getLeftChildRef());
+
+        // TODO Update height
+
+        /*
+        if right child is longer:
+            don't change height, send flag up the chain
+        if a limit was hit further down the chain:
+            don't change height, send flag up the chain
+        else:
+            decrement height
+        */
+        return success;
     }
 
     // Case 2: right subtree
@@ -144,14 +156,17 @@ bool BST::removeFromSubtree(int data, Node *&localRoot)
         {
             return false;
         }
-        return removeFromSubtree(data, localRoot->getRightChildRef());
+        bool success = removeFromSubtree(data, localRoot->getRightChildRef());
+        // TODO Update height
+        return success;
     }
 
-    // Case 4: current node
+    // Case 3: current node
     else
     {
         Node *temp = removeNode(localRoot);
         delete temp;
+        // Update height
         return true;
     }
 }
@@ -183,6 +198,7 @@ Node *BST::removeNode(Node *&localRoot)
         {
             Node *out = localRoot;
             localRoot = NULL;
+            // TODO Update height
             return out;
         }
 
@@ -191,6 +207,7 @@ Node *BST::removeNode(Node *&localRoot)
         {
             Node *out = localRoot;
             localRoot = right;
+            // TODO Update height
             return out;
         }
     }
@@ -203,6 +220,7 @@ Node *BST::removeNode(Node *&localRoot)
         {
             Node *out = localRoot;
             localRoot = left;
+            // TODO Update height
             return out;
         }
 
@@ -245,12 +263,14 @@ Node *BST::removeNodeWith2Children(Node *&localRoot)
         Node *out = localRoot;
         localRoot = left;
         localRoot->setRightChild(right);
+        // TODO Update height
         return out;
     }
 
     // Case 2: left has a right child
     else
     {
+        // TODO Update heights
 
         // Find (parent of) new root node
         Node *newRootParent = left;
