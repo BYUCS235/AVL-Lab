@@ -132,25 +132,23 @@ int Node::getHeight()
 {
     // TODO Implement fast getHeight()
 
-    int rHeight = 1;
-    int lHeight = 1;
+    int height = 1;
 
     if (getLeftChild())
     {
-        lHeight = getLeftChild()->getHeight() + 1;
+        height = getLeftChild()->getHeight() + 1;
     }
+
     if (getRightChild())
     {
-        rHeight = getRightChild()->getHeight() + 1;
+        int rHeight = getRightChild()->getHeight() + 1;
+        if (rHeight > height)
+        {
+            return rHeight;
+        }
     }
-    if (lHeight > rHeight)
-    {
-        return lHeight;
-    }
-    else
-    {
-        return rHeight;
-    }
+
+    return height;
 }
 
 #endif
