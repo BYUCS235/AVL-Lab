@@ -1,10 +1,38 @@
-int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree)
+#include "BST.h"
+
+/**
+ * @brief Updates the height at the given node, recusrively calling the indicated remove funtion.
+ *
+ * @param localRoot The root of the subtree.
+ * @param rmvTreeRef The child node tha might contain the value to remove.
+ * @param otherTree The other child node.
+ * @param callRemoveNode Calls removeNode() if true, otherwise removeFromSubtree()
+ * @param data The value to remove if applicable.
+ *
+ * @return 1 if removed and heights further up should not be updated
+ * @return 0 if removed and heights further up may need to be updated
+ * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
+ */
+int BST::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data = NULL)
 {
     // Save rmvTree's old height for comparison
     int prevRmvTreeHeight = rmvTreeRef->getHeight();
 
     // Recurse down rmvTree
-    int result = removeFromSubtree(data, rmvTreeRef);
+    int result;
+    if (callRemoveNode)
+    {
+        result = removeNode(localRoot);
+    }
+    else
+    {
+        if (!data)
+        {
+            throw;
+        }
+
+        result = removeFromSubtree(data, rmvTreeRef);
+    }
 
     // Simply pass along result if either:
     // removal failed, i.e. data wasn't found (-1)
