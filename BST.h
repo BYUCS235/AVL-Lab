@@ -13,10 +13,13 @@ private:
 
     void clearSubtree(Node *&localRoot);
     bool addToSubtree(int data, Node *localRoot);
+    void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
+
+    // Remove helper functions
     int removeFromSubtree(int data, Node *&localRoot);
+    int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree);
     Node *removeNode(Node *&localRoot);
     Node *removeNodeWith2Children(Node *&localRoot);
-    void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
 public:
     BST();

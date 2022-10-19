@@ -102,6 +102,7 @@ bool BST::addToSubtree(int data, Node *localRoot)
  * Rebalances the tree if data is successfully removed
  *
  * @param data The value to remove.
+ *
  * @return true if successfully removed
  * @return false if remove is unsuccessful (i.e. the value is not in the tree)
  */
@@ -117,8 +118,9 @@ bool BST::remove(int data)
  *
  * @param data The value to remove.
  * @param localRoot The root of the subtree to search.
- * @return 1 if successfully removed and heights further up should be updated
- * @return 0 if successfully removed and heights further up should not be updated
+ *
+ * @return 1 if removed and heights further up should not be updated
+ * @return 0 if removed and heights further up may need to be updated
  * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
 int BST::removeFromSubtree(int data, Node *&localRoot)
@@ -136,19 +138,11 @@ int BST::removeFromSubtree(int data, Node *&localRoot)
         {
             return -1;
         }
-        bool success = removeFromSubtree(data, localRoot->getLeftChildRef());
 
-        // TODO Update height
-
-        /*
-        if right child is longer:
-            don't change height, send flag up the chain
-        if a limit was hit further down the chain:
-            don't change height, send flag up the chain
-        else:
-            decrement height
-        */
-        return success;
+        // Update height
+        return removeFromSubtreeAndUpdateHeights(data, localRoot,
+                                                 localRoot->getLeftChildRef(), // rmvTreeRef
+                                                 localRoot->getRightChild());  // otherTree
     }
 
     // Case 2: right subtree
@@ -158,9 +152,11 @@ int BST::removeFromSubtree(int data, Node *&localRoot)
         {
             return -1;
         }
-        bool success = removeFromSubtree(data, localRoot->getRightChildRef());
-        // TODO Update height
-        return success;
+
+        // Update height
+        return removeFromSubtreeAndUpdateHeights(data, localRoot,
+                                                 localRoot->getRightChildRef(), // rmvTreeRef
+                                                 localRoot->getLeftChild());    // otherTree
     }
 
     // Case 3: current node
@@ -168,8 +164,57 @@ int BST::removeFromSubtree(int data, Node *&localRoot)
     {
         Node *temp = removeNode(localRoot);
         delete temp;
-        // Update height
-        return 1;
+        // TODO Update height
+        return 0;
+    }
+}
+
+/**
+ * @brief Attempt to remove the given value from the given node's subtree.
+ *
+ * @param data The value to remove.
+ * @param localRoot The root of the subtree.
+ * @param rmvTreeRef The child node tha might contain the value to remove.
+ * @param otherTree The other child node.
+
+ * @return 1 if removed and heights further up should not be updated
+ * @return 0 if removed and heights further up may need to be updated
+ * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
+ */
+int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree)
+{
+    // Save rmvTree's old height for comparison
+    int prevRmvTreeHeight = rmvTreeRef->getHeight();
+
+    // Recurse down rmvTree
+    int result = removeFromSubtree(data, rmvTreeRef);
+
+    // Simply pass along result if either:
+    // removal failed, i.e. data wasn't found (-1)
+    // don't-update-heights flag was recieved (1)
+    if (result != 0)
+    {
+        return result;
+    }
+
+    // Update height if necessary
+    else
+    {
+        // If otherTree's height outweighs rmvTree's
+        // Means this node's height won't change, even if removal succeeded
+        if (otherTree != NULL && otherTree->getHeight() >= prevRmvTreeHeight)
+        {
+            // Flag higher nodes not to change their heights
+            return 1;
+        }
+
+        // If otherTree == NULL or its height isn't as large as rmvTree's
+        else
+        {
+            // Decrement height
+            localRoot->setHeight(localRoot->getHeight() - 1);
+            return 0;
+        }
     }
 }
 
