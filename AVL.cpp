@@ -425,6 +425,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 void AVL::clear()
 {
     clearSubtree(this->root); // clear root
+    this->nextId = 0;
 }
 
 void AVL::clearSubtree(Node *&localRoot)
