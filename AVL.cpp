@@ -171,7 +171,7 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         return updateHeightsAndRemove(localRoot,
                                       localRoot->getLeftChildRef(), // rmvTreeRef
                                       localRoot->getRightChild(),   // otherTree
-                                      true, NULL);
+                                      true, data);
     }
 }
 
@@ -203,6 +203,7 @@ int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *other
     {
         if (!data)
         {
+            std::cerr << "Problem! Called updateHeightsAndRemove() with callRemoveNode=false, but recieved NULL value for data." << std::endl;
             throw;
         }
 
@@ -268,6 +269,7 @@ int AVL::removeNode(Node *&localRoot)
             localRoot = NULL;
             delete rmvNode;
             // TODO Update height and return
+            return 0;
         }
 
         // Case 2: Root has right child only
@@ -277,6 +279,7 @@ int AVL::removeNode(Node *&localRoot)
             localRoot = right;
             delete rmvNode;
             // TODO Update height and return
+            return 0;
         }
     }
 
@@ -290,6 +293,7 @@ int AVL::removeNode(Node *&localRoot)
             localRoot = left;
             delete rmvNode;
             // TODO Update height and return
+            return 0;
         }
 
         // Case 4: Root has left and right children
@@ -334,6 +338,7 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
         localRoot->setRightChild(right);
         delete rmvNode;
         // TODO Update height and return
+        return 0;
     }
 
     // Case 2: left has a right child
