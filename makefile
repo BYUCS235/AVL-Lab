@@ -1,8 +1,8 @@
 CXXFLAGS = -Wall -g
 
-main: main.cpp BST.cpp Node.cpp
+main: main.cpp AVL.cpp Node.cpp
 
-test: test.cpp BST.cpp Node.cpp
+test: test.cpp AVL.cpp Node.cpp
 
 clean:
 	rm -f main
