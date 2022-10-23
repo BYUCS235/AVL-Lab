@@ -7,7 +7,7 @@
 struct Node : public NodeInterface
 {
 private:
-    friend class BST;
+    friend class AVL;
     Node *leftChild;
     Node *rightChild;
     int data;

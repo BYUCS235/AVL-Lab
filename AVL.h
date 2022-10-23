@@ -5,7 +5,7 @@
 #include "AVLInterface.h"
 #include "Node.h"
 
-class BST : AVLInterface
+class AVL : AVLInterface
 {
 private:
     Node *root;
@@ -17,13 +17,13 @@ private:
 
     // Remove helper functions
     int removeFromSubtree(int data, Node *&localRoot);
-    int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree);
+    int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree);
     Node *removeNode(Node *&localRoot);
     Node *removeNodeWith2Children(Node *&localRoot);
 
 public:
-    BST();
-    ~BST();
+    AVL();
+    ~AVL();
 
     Node *getRootNode() const;
     bool add(int data);

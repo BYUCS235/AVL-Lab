@@ -2,15 +2,15 @@
 #define BST_CPP_T2K_10_17_2022
 
 #include <iostream>
-#include "BST.h"
+#include "AVL.h"
 
-BST::BST()
+AVL::AVL()
 {
     this->root = NULL;
     this->nextId = 0;
 };
 
-BST::~BST()
+AVL::~AVL()
 {
     clear();
     if (this->root)
@@ -24,7 +24,7 @@ BST::~BST()
  *
  * @return the root node for this tree.
  */
-Node *BST::getRootNode() const
+Node *AVL::getRootNode() const
 {
     return this->root;
 }
@@ -41,7 +41,7 @@ Node *BST::getRootNode() const
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
  */
-bool BST::add(int data)
+bool AVL::add(int data)
 {
     if (this->root == NULL)
     {
@@ -52,7 +52,7 @@ bool BST::add(int data)
     return addToSubtree(data, this->root);
 }
 
-bool BST::addToSubtree(int data, Node *localRoot)
+bool AVL::addToSubtree(int data, Node *localRoot)
 {
     // Case 1: left subtree
     if (data < localRoot->getData())
@@ -106,7 +106,7 @@ bool BST::addToSubtree(int data, Node *localRoot)
  * @return true if successfully removed
  * @return false if remove is unsuccessful (i.e. the value is not in the tree)
  */
-bool BST::remove(int data)
+bool AVL::remove(int data)
 {
     int result = removeFromSubtree(data, this->root);
     return result != -1;
@@ -123,7 +123,7 @@ bool BST::remove(int data)
  * @return 0 if removed and heights further up may need to be updated
  * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
-int BST::removeFromSubtree(int data, Node *&localRoot)
+int AVL::removeFromSubtree(int data, Node *&localRoot)
 {
     // Case 0: NULL
     if (localRoot == NULL)
@@ -181,7 +181,7 @@ int BST::removeFromSubtree(int data, Node *&localRoot)
  * @return 0 if removed and heights further up may need to be updated
  * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
-int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree)
+int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree)
 {
     // Save rmvTree's old height for comparison
     int prevRmvTreeHeight = rmvTreeRef->getHeight();
@@ -224,7 +224,7 @@ int BST::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rm
  *
  * @param localRoot The node to be removed.
  */
-Node *BST::removeNode(Node *&localRoot)
+Node *AVL::removeNode(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -285,7 +285,7 @@ Node *BST::removeNode(Node *&localRoot)
  *
  * @param localRoot
  */
-Node *BST::removeNodeWith2Children(Node *&localRoot)
+Node *AVL::removeNodeWith2Children(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -348,12 +348,12 @@ Node *BST::removeNodeWith2Children(Node *&localRoot)
 /*
  * Removes all nodes from the tree, resulting in an empty tree.
  */
-void BST::clear()
+void AVL::clear()
 {
     clearSubtree(this->root); // clear root
 }
 
-void BST::clearSubtree(Node *&localRoot)
+void AVL::clearSubtree(Node *&localRoot)
 {
     if (localRoot == NULL)
     {
@@ -378,14 +378,14 @@ void BST::clearSubtree(Node *&localRoot)
 //// toString()
 ////
 
-std::string BST::toString() const
+std::string AVL::toString() const
 {
     std::stringstream ss;
     addSubtreeToSStream(this->root, ss, "");
     return ss.str();
 }
 
-void BST::addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const
+void AVL::addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const
 {
     if (localRoot == NULL)
     {
