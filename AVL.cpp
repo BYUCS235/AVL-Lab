@@ -171,7 +171,7 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         return updateHeightsAndRemove(localRoot,
                                       localRoot->getLeftChildRef(), // rmvTreeRef
                                       localRoot->getRightChild(),   // otherTree
-                                      true);
+                                      true, NULL);
     }
 }
 
@@ -188,7 +188,7 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
  * @return 0 if removed and heights further up may need to be updated
  * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
-int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data = NULL)
+int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data)
 {
     // Save rmvTree's old height for comparison
     int prevRmvTreeHeight = rmvTreeRef->getHeight();
@@ -297,6 +297,7 @@ int AVL::removeNode(Node *&localRoot)
         {
             bool result = removeNodeWith2Children(localRoot);
             // TODO Update height and return?
+            return result;
         }
     }
 }
@@ -360,6 +361,8 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
         localRoot->setRightChild(right); // Set new root->right
 
         // TODO Update heights and return?
+
+        return 0;
     }
 }
 
