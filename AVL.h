@@ -17,7 +17,7 @@ private:
 
     // Remove helper functions
     int removeFromSubtree(int data, Node *&localRoot);
-    int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree);
+    int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data = NULL);
     Node *removeNode(Node *&localRoot);
     Node *removeNodeWith2Children(Node *&localRoot);
 
