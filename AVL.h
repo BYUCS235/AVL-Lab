@@ -20,7 +20,7 @@ private:
     int updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data);
     int removeNode(Node *&localRoot);
     int removeNodeWith2Children(Node *&localRoot);
-    bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rmvLocation);
+    bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rmvLocation);
 
 public:
     AVL();

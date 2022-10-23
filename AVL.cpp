@@ -372,44 +372,46 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
     }
 }
 
-bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rmvLocation)
+bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 {
+    // Base case
     if (currentNode->getRightChild()->getRightChild() == NULL)
     {
-
+        rootParent = currentNode;
         return true;
     }
+
     else
     {
         // Recurse
-        bool childUpdated = updateHeightsAndFindReplacement(currentNode->getRightChild(), rmvLocation);
+        bool childUpdated = updateHeightsAndFindReplacement(currentNode->getRightChild(), rootParent);
 
         // Update height if necessary
-        if (childUpdated)
+
+        // If child didn't update, parent doesn't need to update
+        if (!childUpdated)
         {
-            if (currentNode->getLeftChild() == NULL)
-            {
-                // Update height
-                currentNode->setHeight(currentNode->getHeight() - 1);
-                return true;
-            }
-            else
-            {
-                int lHeight = currentNode->getLeftChild()->getHeight();
-                int rHeight = currentNode->getRightChild()->getHeight();
-                if (lHeight > rHeight)
-                {
-                    // Left subtree outweighs right. Don't update height
-                    return false;
-                }
-                else
-                {
-                    // Update height
-                    currentNode->setHeight(currentNode->getHeight() - 1);
-                    return true;
-                }
-            }
+            return false;
         }
+
+        if (currentNode->getLeftChild() == NULL)
+        {
+            // Update height
+            currentNode->setHeight(currentNode->getHeight() - 1);
+            return true;
+        }
+
+        int lHeight = currentNode->getLeftChild()->getHeight();
+        int rHeight = currentNode->getRightChild()->getHeight();
+        if (lHeight > rHeight)
+        {
+            // Left subtree outweighs right. Don't update height
+            return false;
+        }
+
+        // Update height
+        currentNode->setHeight(currentNode->getHeight() - 1);
+        return true;
     }
 }
 
