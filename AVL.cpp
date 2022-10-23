@@ -140,9 +140,11 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         }
 
         // Update height
-        return removeFromSubtreeAndUpdateHeights(data, localRoot,
-                                                 localRoot->getLeftChildRef(), // rmvTreeRef
-                                                 localRoot->getRightChild());  // otherTree
+        // callRemoveNode=false: recursively calls removeFromSubtree()
+        return updateHeightsAndRemove(localRoot,
+                                      localRoot->getLeftChildRef(), // rmvTreeRef
+                                      localRoot->getRightChild(),   // otherTree
+                                      false, data);
     }
 
     // Case 2: right subtree
@@ -154,40 +156,58 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         }
 
         // Update height
-        return removeFromSubtreeAndUpdateHeights(data, localRoot,
-                                                 localRoot->getRightChildRef(), // rmvTreeRef
-                                                 localRoot->getLeftChild());    // otherTree
+        // callRemoveNode=false: recursively calls removeFromSubtree()
+        return updateHeightsAndRemove(localRoot,
+                                      localRoot->getRightChildRef(), // rmvTreeRef
+                                      localRoot->getLeftChild(),     // otherTree
+                                      false, data);
     }
 
     // Case 3: current node
     else
     {
-        Node *temp = removeNode(localRoot);
-        delete temp;
-        // TODO Update height
-        return 0;
+        // Update height
+        // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
+        return updateHeightsAndRemove(localRoot,
+                                      localRoot->getLeftChildRef(), // rmvTreeRef
+                                      localRoot->getRightChild(),   // otherTree
+                                      true);
     }
 }
 
 /**
- * @brief Attempt to remove the given value from the given node's subtree.
+ * @brief Updates the height at the given node, recusrively calling the indicated remove funtion.
  *
- * @param data The value to remove.
  * @param localRoot The root of the subtree.
  * @param rmvTreeRef The child node tha might contain the value to remove.
  * @param otherTree The other child node.
-
+ * @param callRemoveNode Calls removeNode() if true, otherwise removeFromSubtree()
+ * @param data The value to remove if applicable.
+ *
  * @return 1 if removed and heights further up should not be updated
  * @return 0 if removed and heights further up may need to be updated
  * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
  */
-int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rmvTreeRef, Node *otherTree)
+int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data = NULL)
 {
     // Save rmvTree's old height for comparison
     int prevRmvTreeHeight = rmvTreeRef->getHeight();
 
     // Recurse down rmvTree
-    int result = removeFromSubtree(data, rmvTreeRef);
+    int result;
+    if (callRemoveNode)
+    {
+        result = removeNode(localRoot);
+    }
+    else
+    {
+        if (!data)
+        {
+            throw;
+        }
+
+        result = removeFromSubtree(data, rmvTreeRef);
+    }
 
     // Simply pass along result if either:
     // removal failed, i.e. data wasn't found (-1)
@@ -208,7 +228,8 @@ int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rm
             return 1;
         }
 
-        // If otherTree == NULL or its height isn't as large as rmvTree's
+        // If otherTree == NULL
+        // or its height isn't as large enough to outweigh rmvTree's
         else
         {
             // Decrement height
@@ -224,7 +245,7 @@ int AVL::removeFromSubtreeAndUpdateHeights(int data, Node *&localRoot, Node *&rm
  *
  * @param localRoot The node to be removed.
  */
-Node *AVL::removeNode(Node *&localRoot)
+int AVL::removeNode(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -243,19 +264,19 @@ Node *AVL::removeNode(Node *&localRoot)
         // Case 1: Root has no children
         if (right == NULL)
         {
-            Node *out = localRoot;
+            Node *rmvNode = localRoot;
             localRoot = NULL;
-            // TODO Update height
-            return out;
+            delete rmvNode;
+            // TODO Update height and return
         }
 
         // Case 2: Root has right child only
         else
         {
-            Node *out = localRoot;
+            Node *rmvNode = localRoot;
             localRoot = right;
-            // TODO Update height
-            return out;
+            delete rmvNode;
+            // TODO Update height and return
         }
     }
 
@@ -265,17 +286,17 @@ Node *AVL::removeNode(Node *&localRoot)
         // Case 3: Root has left child only
         if (right == NULL)
         {
-            Node *out = localRoot;
+            Node *rmvNode = localRoot;
             localRoot = left;
-            // TODO Update height
-            return out;
+            delete rmvNode;
+            // TODO Update height and return
         }
 
         // Case 4: Root has left and right children
         else
         {
-            Node *out = removeNodeWith2Children(localRoot);
-            return out;
+            bool result = removeNodeWith2Children(localRoot);
+            // TODO Update height and return?
         }
     }
 }
@@ -285,7 +306,7 @@ Node *AVL::removeNode(Node *&localRoot)
  *
  * @param localRoot
  */
-Node *AVL::removeNodeWith2Children(Node *&localRoot)
+int AVL::removeNodeWith2Children(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -307,11 +328,11 @@ Node *AVL::removeNodeWith2Children(Node *&localRoot)
     // Case 1: left has no right child
     if (left->getRightChild() == NULL)
     {
-        Node *out = localRoot;
+        Node *rmvNode = localRoot;
         localRoot = left;
         localRoot->setRightChild(right);
-        // TODO Update height
-        return out;
+        delete rmvNode;
+        // TODO Update height and return
     }
 
     // Case 2: left has a right child
@@ -329,15 +350,16 @@ Node *AVL::removeNodeWith2Children(Node *&localRoot)
         // Assert: newRootParent->right is the new root (and has no right child)
 
         // Update pointers
-        Node *out = localRoot;
+        Node *rmvNode = localRoot;
         localRoot = newRootParent->getRightChild(); // Set root pointer
+        delete rmvNode;
 
         newRootParent->setRightChild(newRootParent->getRightChild()->getLeftChild()); // Save new root's old left child
 
         localRoot->setLeftChild(left);   // Set new root->left
         localRoot->setRightChild(right); // Set new root->right
 
-        return out;
+        // TODO Update heights and return?
     }
 }
 
