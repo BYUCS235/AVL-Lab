@@ -352,30 +352,64 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
     // Case 2: left has a right child
     else
     {
-        // TODO Update heights
+        // Find (the parent of) the new root
+        Node *rootParent;
+        updateHeightsAndFindReplacement(left, rootParent);
 
-        // Find (parent of) new root node
-        Node *newRootParent = left;
-        while (newRootParent->getRightChild()->getRightChild()) // while newRootParent is a grandparent (on the right)
-        {
-            newRootParent = newRootParent->getRightChild();
-        }
-
-        // Assert: newRootParent->right is the new root (and has no right child)
-
-        // Update pointers
+        // Delete old root and update localRoot pointer
         Node *rmvNode = localRoot;
-        localRoot = newRootParent->getRightChild(); // Set root pointer
+        localRoot = rootParent->getRightChild();
         delete rmvNode;
 
-        newRootParent->setRightChild(newRootParent->getRightChild()->getLeftChild()); // Save new root's old left child
+        // Update pointers to remove the new root from its previous location
+        rootParent->setRightChild(rootParent->getRightChild()->getLeftChild());
 
+        // Set new root's children
         localRoot->setLeftChild(left);   // Set new root->left
         localRoot->setRightChild(right); // Set new root->right
 
-        // TODO Update heights and return?
-
         return 0;
+    }
+}
+
+bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rmvLocation)
+{
+    if (currentNode->getRightChild()->getRightChild() == NULL)
+    {
+
+        return true;
+    }
+    else
+    {
+        // Recurse
+        bool childUpdated = updateHeightsAndFindReplacement(currentNode->getRightChild(), rmvLocation);
+
+        // Update height if necessary
+        if (childUpdated)
+        {
+            if (currentNode->getLeftChild() == NULL)
+            {
+                // Update height
+                currentNode->setHeight(currentNode->getHeight() - 1);
+                return true;
+            }
+            else
+            {
+                int lHeight = currentNode->getLeftChild()->getHeight();
+                int rHeight = currentNode->getRightChild()->getHeight();
+                if (lHeight > rHeight)
+                {
+                    // Left subtree outweighs right. Don't update height
+                    return false;
+                }
+                else
+                {
+                    // Update height
+                    currentNode->setHeight(currentNode->getHeight() - 1);
+                    return true;
+                }
+            }
+        }
     }
 }
 
