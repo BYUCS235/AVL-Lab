@@ -1,6 +1,7 @@
 #ifndef NODE_CPP_T2K_10_17_2022
 #define NODE_CPP_T2K_10_17_2022
 
+#include <iostream>
 #include "Node.h"
 
 Node::Node(int data, int id)
@@ -84,6 +85,7 @@ Node *&Node::getLeftChildRef()
 {
     if (this->leftChild == NULL)
     {
+        std::cerr << "Error! Called getLeftChildRef() when this->leftChild is NULL" << std::endl;
         throw;
     }
     return this->leftChild;
@@ -98,6 +100,7 @@ Node *&Node::getRightChildRef()
 {
     if (this->rightChild == NULL)
     {
+        std::cerr << "Error! Called getRightChildRef() when this->rightChild is NULL" << std::endl;
         throw;
     }
     return this->rightChild;

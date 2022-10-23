@@ -166,12 +166,22 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
     // Case 3: current node
     else
     {
-        // Update height
-        // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
-        return updateHeightsAndRemove(localRoot,
-                                      localRoot->getLeftChildRef(), // rmvTreeRef
-                                      localRoot->getRightChild(),   // otherTree
-                                      true, data);
+        // No left child
+        if (localRoot->getLeftChild() == NULL)
+        {
+            return removeNode(localRoot);
+        }
+
+        // Has left child
+        else
+        {
+            // Update height
+            // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
+            return updateHeightsAndRemove(localRoot,
+                                          localRoot->getLeftChildRef(), // rmvTreeRef
+                                          localRoot->getRightChild(),   // otherTree
+                                          true, data);
+        }
     }
 }
 
