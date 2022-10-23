@@ -433,7 +433,7 @@ void AVL::addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::strin
         return;
     }
 
-    ss << prefix << localRoot->getData() << "(" << localRoot->id << ")";
+    ss << prefix << localRoot->getData() << "(" << localRoot->height << ")";
     prefix += "  ";
 
     if (localRoot->getLeftChild() == NULL && localRoot->getRightChild() == NULL)
