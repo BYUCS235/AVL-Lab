@@ -72,10 +72,10 @@ bool AVL::addToSubtree(int data, Node *localRoot)
             bool result = addToSubtree(data, localRoot->getLeftChild());
             if (result)
             {
-                updateHeight(localRoot, 
-                         localRoot->getLeftChild(),  // updateChild
-                         localRoot->getRightChild(), // otherChild
-                         1);
+                updateHeight(localRoot,
+                             localRoot->getLeftChild(),  // updateChild
+                             localRoot->getRightChild(), // otherChild
+                             1);
             }
             return result;
         }
@@ -88,8 +88,8 @@ bool AVL::addToSubtree(int data, Node *localRoot)
         {
             localRoot->setRightChild(new Node(data, nextId));
             updateHeight(localRoot,
-                         localRoot->getRightChild(),  // updateChild
-                         localRoot->getLeftChild(), // otherChild
+                         localRoot->getRightChild(), // updateChild
+                         localRoot->getLeftChild(),  // otherChild
                          1);
             this->nextId++;
             return true;
@@ -100,8 +100,8 @@ bool AVL::addToSubtree(int data, Node *localRoot)
             if (result)
             {
                 updateHeight(localRoot,
-                             localRoot->getRightChild(),  // updateChild
-                             localRoot->getLeftChild(), // otherChild
+                             localRoot->getRightChild(), // updateChild
+                             localRoot->getLeftChild(),  // otherChild
                              1);
             }
             return result;
@@ -309,22 +309,26 @@ int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *other
     // Update height if necessary
     else
     {
-        // If otherTree's height outweighs rmvTree's
-        // Means this node's height won't change, even if removal succeeded
-        if (otherTree != NULL && otherTree->getHeight() >= prevRmvTreeHeight)
-        {
-            // Flag higher nodes not to change their heights
-            return 1;
-        }
+        bool wasUpdated = updateHeight(localRoot, rmvTreeRef, otherTree, -1);
+        // If this node was NOT updated, flag higher nodes not to change their heights
+        return (!wasUpdated) ? 1 : 0;
 
-        // If otherTree == NULL
-        // or its height isn't as large enough to outweigh rmvTree's
-        else
-        {
-            // Decrement height
-            localRoot->setHeight(localRoot->getHeight() - 1);
-            return 0;
-        }
+        // // If otherTree's height outweighs rmvTree's
+        // // Means this node's height won't change, even if removal succeeded
+        // if (otherTree != NULL && otherTree->getHeight() >= prevRmvTreeHeight)
+        // {
+        //     // Flag higher nodes not to change their heights
+        //     return 1;
+        // }
+
+        // // If otherTree == NULL
+        // // or its height isn't as large enough to outweigh rmvTree's
+        // else
+        // {
+        //     // Decrement height
+        //     localRoot->setHeight(localRoot->getHeight() - 1);
+        //     return 0;
+        // }
     }
 }
 
@@ -472,24 +476,29 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
             return false;
         }
 
-        if (currentNode->getLeftChild() == NULL)
-        {
-            // Update height
-            currentNode->setHeight(currentNode->getHeight() - 1);
-            return true;
-        }
+        return updateHeight(currentNode,                  // localRoot
+                            currentNode->getRightChild(), // updateChild
+                            currentNode->getLeftChild(),  // otherChild
+                            -1);                          // increment
 
-        int lHeight = currentNode->getLeftChild()->getHeight();
-        int rHeight = currentNode->getRightChild()->getHeight();
-        if (lHeight > rHeight)
-        {
-            // Left subtree outweighs right. Don't update height
-            return false;
-        }
+        // if (currentNode->getLeftChild() == NULL)
+        // {
+        //     // Update height
+        //     currentNode->setHeight(currentNode->getHeight() - 1);
+        //     return true;
+        // }
 
-        // Update height
-        currentNode->setHeight(currentNode->getHeight() - 1);
-        return true;
+        // int lHeight = currentNode->getLeftChild()->getHeight();
+        // int rHeight = currentNode->getRightChild()->getHeight();
+        // if (lHeight > rHeight)
+        // {
+        //     // Left subtree outweighs right. Don't update height
+        //     return false;
+        // }
+
+        // // Update height
+        // currentNode->setHeight(currentNode->getHeight() - 1);
+        // return true;
     }
 }
 
