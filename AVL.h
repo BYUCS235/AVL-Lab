@@ -15,7 +15,7 @@ private:
     bool addToSubtree(int data, Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
-    void AVL::updateHeight(Node *node, bool isLeft, int increment);
+    bool AVL::updateHeight(Node *node, bool isLeft, int increment);
 
     // Remove helper functions
     int removeFromSubtree(int data, Node *&localRoot);

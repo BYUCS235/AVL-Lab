@@ -105,15 +105,15 @@ bool AVL::addToSubtree(int data, Node *localRoot)
     // TODO Add() rebalancing
 }
 
-void AVL::updateHeight(Node *node, bool isLeft, int increment)
+bool AVL::updateHeight(Node *node, bool isLeft, int increment)
 {
     // Note: assumes child node HAS ALREADY BEEN updated.
 
     // Check for invalid input
     if (increment != 1 && increment != -1)
     {
-        std::cerr << "Warning: called incrementHeight() with the increment not equal to 1 or -1" << std::endl;
-        return;
+        std::cerr << "Error: called incrementHeight() with the increment not equal to 1 or -1" << std::endl;
+        throw;
     }
 
     Node *updateChild = (isLeft) ? node->getLeftChild() : node->getRightChild();
@@ -122,13 +122,13 @@ void AVL::updateHeight(Node *node, bool isLeft, int increment)
     // Check for null child nodes
     if (updateChild == NULL)
     {
-        std::cerr << "Warning: called incrementHeight() with updateChild equal to NULL" << std::endl;
-        return;
+        std::cerr << "Error: called incrementHeight() with updateChild equal to NULL" << std::endl;
+        throw;
     }
     if (otherChild == NULL)
     {
         node->setHeight(node->getHeight() + increment);
-        return;
+        return true;
     }
 
     /*
@@ -156,7 +156,10 @@ void AVL::updateHeight(Node *node, bool isLeft, int increment)
     if (maxHeight >= otherHeight)
     {
         node->setHeight(node->getHeight() + increment);
+        return true;
     }
+
+    return false;
 }
 
 ////
