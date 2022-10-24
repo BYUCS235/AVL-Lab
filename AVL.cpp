@@ -93,6 +93,60 @@ bool AVL::addToSubtree(int data, Node *localRoot)
     // TODO Add() rebalancing
 }
 
+void AVL::updateHeight(Node *node, bool isLeft, int increment)
+{
+    // Note: assumes child node HAS ALREADY BEEN updated.
+
+    // Check for invalid input
+    if (increment != 1 && increment != -1)
+    {
+        std::cerr << "Warning: called incrementHeight() with the increment not equal to 1 or -1" << std::endl;
+        return;
+    }
+
+    Node *updateChild = (isLeft) ? node->getLeftChild() : node->getRightChild();
+    Node *otherChild = (isLeft) ? node->getRightChild() : node->getLeftChild();
+
+    // Check for null child nodes
+    if (updateChild == NULL)
+    {
+        std::cerr << "Warning: called incrementHeight() with updateChild equal to NULL" << std::endl;
+        return;
+    }
+    if (otherChild == NULL)
+    {
+        node->setHeight(node->getHeight() + increment);
+        return;
+    }
+
+    /*
+    All possible combinations
+
+    prev,post, other, increment
+
+    1,2, 0, +   1->2 yes
+    1,2, 1, +   1->2 yes
+    1,2, 2, +   2->2 no
+    1,2, 3, +   3->3 no
+
+    2,1, 0, -   2->1 yes
+    2,1, 1, -   2->1 yes
+    2,1, 2, -   2->2 no
+    2,1, 3, -   3->3 no
+
+    increment height iff max(prev,post) >= other
+    */
+
+    // Find max(old height, new height)
+    int maxHeight = increment > 0 ? updateChild->getHeight() : updateChild->getHeight() - increment;
+    int otherHeight = otherChild->getHeight();
+
+    if (maxHeight >= otherHeight)
+    {
+        node->setHeight(node->getHeight() + increment);
+    }
+}
+
 ////
 //// remove()
 ////
