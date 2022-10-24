@@ -60,12 +60,18 @@ bool AVL::addToSubtree(int data, Node *localRoot)
         if (localRoot->getLeftChild() == NULL)
         {
             localRoot->setLeftChild(new Node(data, nextId));
+            updateHeight(localRoot, true, 1);
             this->nextId++;
             return true;
         }
         else
         {
-            return addToSubtree(data, localRoot->getLeftChild());
+            bool result = addToSubtree(data, localRoot->getLeftChild());
+            if (result)
+            {
+                updateHeight(localRoot, true, 1);
+            }
+            return result;
         }
     }
 
@@ -75,12 +81,18 @@ bool AVL::addToSubtree(int data, Node *localRoot)
         if (localRoot->getRightChild() == NULL)
         {
             localRoot->setRightChild(new Node(data, nextId));
+            updateHeight(localRoot, false, 1);
             this->nextId++;
             return true;
         }
         else
         {
-            return addToSubtree(data, localRoot->getRightChild());
+            bool result = addToSubtree(data, localRoot->getRightChild());
+            if (result)
+            {
+                updateHeight(localRoot, false, 1);
+            }
+            return result;
         }
     }
 
