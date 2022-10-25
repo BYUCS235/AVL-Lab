@@ -42,12 +42,24 @@ Node *AVL::getRootNode() const
  */
 bool AVL::add(int data)
 {
+#ifdef DEBUG
+    std::cout << "add(" << data << ")" << std::endl;
+#endif
+
     if (this->root == NULL)
     {
         this->root = new Node(data, nextId);
         this->nextId++;
+#ifdef DEBUG
+        std::cout << "Finished add(" << data << ")" << std::endl;
+#endif
+
         return true;
     }
+#ifdef DEBUG
+    std::cout << "Finished add(" << data << ")" << std::endl;
+#endif
+
     return addToSubtree(data, this->root);
 }
 
@@ -139,6 +151,7 @@ bool AVL::addToSubtree(int data, Node *localRoot)
  */
 bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment)
 {
+
     // Note: assumes child node HAS ALREADY BEEN updated.
 
     // Check for invalid input
@@ -157,6 +170,10 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
         localRoot->setHeight(localRoot->getHeight() + increment);
         return true; // Updated height
     }
+
+#ifdef DEBUG
+    std::cout << "updateHeight(root=" << localRoot->id << ", u=" << updateChild->id << ", o=" << otherChild->id << ")" << std::endl;
+#endif
 
     /*
     All possible combinations
@@ -208,7 +225,18 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
  */
 bool AVL::remove(int data)
 {
+#ifdef DEBUG
+    std::cout << "remove(" << data << ")" << std::endl;
+    std::cout << this->toString() << std::endl
+              << std::endl;
+#endif
+
     bool rmvResult = removeFromSubtree(data, this->root);
+
+#ifdef DEBUG
+    std::cout << "Finished remove(" << data << "), returning removeFromSubtree value of " << rmvResult << std::endl;
+#endif
+
     return rmvResult;
     // TODO Remove() rebalancing
 }
@@ -226,14 +254,23 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
     // Case 0: NULL
     if (localRoot == NULL)
     {
+#ifdef DEBUG
+        std::cout << "removeFromSubtree(" << data << ", null) - returning false" << std::endl;
+#endif
         return false; // Remove failed
     }
 
     // Case 1: left subtree
     else if (data < localRoot->data)
     {
+#ifdef DEBUG
+        std::cout << "removeFromSubtree(" << data << ", rootID=" << localRoot->id << ")" << std::endl;
+#endif
         if (localRoot->getLeftChild() == NULL)
         {
+#ifdef DEBUG
+            std::cout << "left child is null, returning false" << std::endl;
+#endif
             return false; // Remove failed
         }
 
@@ -245,6 +282,9 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
                                               localRoot->getLeftChildRef(), // rmvTreeRef
                                               localRoot->getRightChild(),   // otherTree
                                               false, data);
+#ifdef DEBUG
+            std::cout << "Finished removeFromSubtree(" << data << ", returning updateHeightsAndRemove() result of " << out << std::endl;
+#endif
             return out;
         }
     }
@@ -252,8 +292,14 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
     // Case 2: right subtree
     else if (data > localRoot->data)
     {
+#ifdef DEBUG
+        std::cout << "removeFromSubtree(" << data << ", rootID=" << localRoot->id << ")" << std::endl;
+#endif
         if (localRoot->getRightChild() == NULL)
         {
+#ifdef DEBUG
+            std::cout << "right child is null, returning false" << std::endl;
+#endif
             return false; // Remove failed
         }
 
@@ -265,6 +311,9 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
                                               localRoot->getRightChildRef(), // rmvTreeRef
                                               localRoot->getLeftChild(),     // otherTree
                                               false, data);
+#ifdef DEBUG
+            std::cout << "Finished removeFromSubtree(" << data << ", returning updateHeightsAndRemove() value " << out << std::endl;
+#endif
             return out;
         }
     }
@@ -272,22 +321,37 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
     // Case 3: current node
     else
     {
+#ifdef DEBUG
+        std::cout << "case 3, ";
+#endif
         // No left child
         if (localRoot->getLeftChild() == NULL)
         {
+#ifdef DEBUG
+            std::cout << "no left child" << std::endl;
+#endif
             removeNode(localRoot);
+#ifdef DEBUG
+            std::cout << "Finished removeFromSubtree(" << data << ", returning true" << std::endl;
+#endif
             return true; // Removed node successfully
         }
 
         // Has left child
         else
         {
+#ifdef DEBUG
+            std::cout << "has left child" << std::endl;
+#endif
             // Update height
             // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
             updateHeightsAndRemove(localRoot,
                                    localRoot->getLeftChildRef(), // rmvTreeRef
                                    localRoot->getRightChild(),   // otherTree
                                    true, data);
+#ifdef DEBUG
+            std::cout << "Finished removeFromSubtree(" << data << "), returning true" << std::endl;
+#endif
 
             return true; // Removed node successfully
         }
@@ -307,6 +371,10 @@ bool AVL::removeFromSubtree(int data, Node *&localRoot)
  */
 bool AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data)
 {
+#ifdef DEBUG
+    int otherTreeId = (otherTree) ? otherTree->id : -1;
+    std::cout << "updateHeightsAndRemove(rootID=" << localRoot->id << ", rmvID=" << rmvTreeRef->id << ", otherID=" << otherTreeId << ", rmvNode=" << callRemoveNode << ", data=" << data << ")" << std::endl;
+#endif
 
     // Base case
     if (callRemoveNode)
@@ -327,11 +395,18 @@ bool AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *othe
         // Return without updating if the remove failed
         if (!removedSuccessfully)
         {
+#ifdef DEBUG
+            std::cout << "updateHeightsAndRemove: call to removeFromSubtree returned false, returning false" << std::endl;
+#endif
 
             return false;
         }
         updateHeight(localRoot, rmvTreeRef, otherTree, -1);
     }
+
+#ifdef DEBUG
+    std::cout << "Finished updateHeightsAndRemove(data=" << data << "), returning true" << std::endl;
+#endif
 
     return true;
 }
@@ -350,6 +425,7 @@ void AVL::removeNode(Node *&localRoot)
         std::cout << "Problem! Called removeNode(NULL), should be unreachable" << std::endl;
         throw;
     }
+    std::cout << "removeNode(id=" << localRoot->id << ")" << std::endl;
 #endif
 
     Node *left = localRoot->getLeftChild();
@@ -361,6 +437,9 @@ void AVL::removeNode(Node *&localRoot)
         // Case 1: Root has no children
         if (right == NULL)
         {
+#ifdef DEBUG
+            std::cout << "removeNode case 1" << std::endl;
+#endif
             Node *rmvNode = localRoot;
             localRoot = NULL;
             delete rmvNode;
@@ -369,6 +448,9 @@ void AVL::removeNode(Node *&localRoot)
         // Case 2: Root has right child only
         else
         {
+#ifdef DEBUG
+            std::cout << "removeNode case 2" << std::endl;
+#endif
             Node *rmvNode = localRoot;
             localRoot = right;
             delete rmvNode;
@@ -379,6 +461,10 @@ void AVL::removeNode(Node *&localRoot)
     else
     {
         // Case 3: Root has left child only
+#ifdef DEBUG
+        std::cout << "removeNode case 3" << std::endl;
+#endif
+
         if (right == NULL)
         {
             Node *rmvNode = localRoot;
@@ -389,6 +475,9 @@ void AVL::removeNode(Node *&localRoot)
         // Case 4: Root has left and right children
         else
         {
+#ifdef DEBUG
+            std::cout << "removeNode case 4" << std::endl;
+#endif
             removeNodeWith2Children(localRoot);
         }
     }
@@ -422,6 +511,9 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
     // Case 1: left has no right child
     if (left->getRightChild() == NULL)
     {
+#ifdef DEBUG
+        std::cout << "removeNodeWith2Children case 1" << std::endl;
+#endif
         Node *rmvNode = localRoot;
         localRoot = left;
         localRoot->setRightChild(right);
@@ -431,6 +523,9 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
     // Case 2: left does have a right child
     else
     {
+#ifdef DEBUG
+        std::cout << "removeNodeWith2Children case 2" << std::endl;
+#endif
         // Find (the parent of) the new root
         Node *rootParent = NULL;
         updateHeightsAndFindReplacement(left, rootParent);
@@ -460,10 +555,16 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
  */
 bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 {
+#ifdef DEBUG
+    std::cout << "updateHeightsAndFindReplacement(id=" << currentNode->id << ")" << std::endl;
+#endif
     // Base case
     if (currentNode->getRightChild()->getRightChild() == NULL)
     {
         rootParent = currentNode;
+#ifdef DEBUG
+        std::cout << "current.right.right==NULL, setting rootParent and returning true" << std::endl;
+#endif
         return true;
     }
 
@@ -477,6 +578,9 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
         // If child didn't update, parent doesn't need to update
         if (!childUpdated)
         {
+#ifdef DEBUG
+            std::cout << "child didn't update, returning false" << std::endl;
+#endif
             return false;
         }
 
@@ -484,6 +588,9 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
                                    currentNode->getRightChild(), // updateChild
                                    currentNode->getLeftChild(),  // otherChild
                                    -1);                          // increment
+#ifdef DEBUG
+        std::cout << "Finished updateHeightsAndFindReplacement(id=" << currentNode->id << "), returning updateHeight() value of " << result << std::endl;
+#endif
         return result;
     }
 }
