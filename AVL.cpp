@@ -19,9 +19,8 @@ AVL::~AVL()
     }
 }
 
-/*
- * Returns the root node for this tree
- *
+/**
+ * @brief Return the root node for this tree.
  * @return the root node for this tree.
  */
 Node *AVL::getRootNode() const
@@ -34,9 +33,9 @@ Node *AVL::getRootNode() const
 ////
 ////
 
-/*
- * Attempts to add the given value to the BST tree
- * Rebalances the tree if data is successfully added
+/**
+ * @brief Attempt to add the given value to the BST tree.
+ * Rebalances the tree if data is successfully added.
  *
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
@@ -52,6 +51,15 @@ bool AVL::add(int data)
     return addToSubtree(data, this->root);
 }
 
+/**
+ * @brief Attempt to add the given value to the given subtree.
+ * Rebalances the tree if data is successfully added.
+ *
+ * @param data
+ * @param localRoot
+ * @return true if added
+ * @return false if unsuccessful (i.e. the value is already in tree)
+ */
 bool AVL::addToSubtree(int data, Node *localRoot)
 {
     // Case 1: left subtree
@@ -60,24 +68,24 @@ bool AVL::addToSubtree(int data, Node *localRoot)
         if (localRoot->getLeftChild() == NULL)
         {
             localRoot->setLeftChild(new Node(data, nextId));
+            this->nextId++;
             updateHeight(localRoot,
                          localRoot->getLeftChild(),  // updateChild
                          localRoot->getRightChild(), // otherChild
                          1);
-            this->nextId++;
-            return true;
+            return true; // Added node successfully
         }
         else
         {
-            bool result = addToSubtree(data, localRoot->getLeftChild());
-            if (result)
+            bool addedNodeSuccessfully = addToSubtree(data, localRoot->getLeftChild());
+            if (addedNodeSuccessfully)
             {
                 updateHeight(localRoot,
                              localRoot->getLeftChild(),  // updateChild
                              localRoot->getRightChild(), // otherChild
                              1);
             }
-            return result;
+            return addedNodeSuccessfully;
         }
     }
 
@@ -92,31 +100,43 @@ bool AVL::addToSubtree(int data, Node *localRoot)
                          localRoot->getLeftChild(),  // otherChild
                          1);
             this->nextId++;
-            return true;
+            return true; // Added node successfully
         }
         else
         {
-            bool result = addToSubtree(data, localRoot->getRightChild());
-            if (result)
+            bool addedNodeSuccessfully = addToSubtree(data, localRoot->getRightChild());
+            if (addedNodeSuccessfully)
             {
                 updateHeight(localRoot,
                              localRoot->getRightChild(), // updateChild
                              localRoot->getLeftChild(),  // otherChild
                              1);
             }
-            return result;
+            return addedNodeSuccessfully;
         }
     }
 
     // Case 3: current node (i.e. duplicate)
     else
     {
-        return false;
+        return false; // Failed to add node
     }
 
     // TODO Add() rebalancing
 }
 
+/**
+ * @brief Update the height of the given node.
+ * Updates height by the given increment, based on the heights of its children.
+ * Assumes child HAS ALREADY been updated by the given amount.
+ *
+ * @param localRoot The node to update.
+ * @param updateChild The child node whose height changed. Does NOT accept null values.
+ * @param otherChild The child node whose height did not change. Can be NULL.
+ * @param increment The amount by which to increment the height. Either 1 or -1.
+ * @return true if this node's height changed.
+ * @return false otherwise, i.e. if otherChild's height was much greater than updateChild's.
+ */
 bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment)
 {
     // Note: assumes child node HAS ALREADY BEEN updated.
@@ -124,20 +144,18 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
     // Check for invalid input
     if (increment != 1 && increment != -1)
     {
-        std::cerr << "Error: called incrementHeight() with the increment not equal to 1 or -1" << std::endl;
+        std::cout << "Error: called updateHeight() with the increment not equal to 1 or -1" << std::endl;
         throw;
     }
 
     // Check for null child nodes
-    if (updateChild == NULL)
+    if (updateChild == NULL || otherChild == NULL)
     {
-        std::cerr << "Error: called incrementHeight() with updateChild equal to NULL" << std::endl;
-        throw;
-    }
-    if (otherChild == NULL)
-    {
+#ifdef DEBUG
+        std::cout << "updateHeight(root=" << localRoot->id << ") (has at least 1 NULL child)" << std::endl;
+#endif
         localRoot->setHeight(localRoot->getHeight() + increment);
-        return true;
+        return true; // Updated height
     }
 
     /*
@@ -165,14 +183,18 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
     if (maxHeight >= otherHeight)
     {
         localRoot->setHeight(localRoot->getHeight() + increment);
-        return true;
+        return true; // Updated height
     }
 
-    return false;
+    return false; // Did not update height
 }
 
 ////
+////
+////
 //// remove()
+////
+////
 ////
 
 /**
@@ -186,8 +208,8 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
  */
 bool AVL::remove(int data)
 {
-    int result = removeFromSubtree(data, this->root);
-    return result != -1;
+    bool rmvResult = removeFromSubtree(data, this->root);
+    return rmvResult;
     // TODO Remove() rebalancing
 }
 
@@ -196,17 +218,15 @@ bool AVL::remove(int data)
  *
  * @param data The value to remove.
  * @param localRoot The root of the subtree to search.
- *
- * @return 1 if removed and heights further up should not be updated
- * @return 0 if removed and heights further up may need to be updated
- * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
+ * @return true if the value was removed successfully.
+ * @return false otherwise, i.e. if the value is not in the subtree.
  */
-int AVL::removeFromSubtree(int data, Node *&localRoot)
+bool AVL::removeFromSubtree(int data, Node *&localRoot)
 {
     // Case 0: NULL
     if (localRoot == NULL)
     {
-        return -1;
+        return false; // Remove failed
     }
 
     // Case 1: left subtree
@@ -214,15 +234,19 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
     {
         if (localRoot->getLeftChild() == NULL)
         {
-            return -1;
+            return false; // Remove failed
         }
 
         // Update height
         // callRemoveNode=false: recursively calls removeFromSubtree()
-        return updateHeightsAndRemove(localRoot,
-                                      localRoot->getLeftChildRef(), // rmvTreeRef
-                                      localRoot->getRightChild(),   // otherTree
-                                      false, data);
+        else
+        {
+            bool out = updateHeightsAndRemove(localRoot,
+                                              localRoot->getLeftChildRef(), // rmvTreeRef
+                                              localRoot->getRightChild(),   // otherTree
+                                              false, data);
+            return out;
+        }
     }
 
     // Case 2: right subtree
@@ -230,15 +254,19 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
     {
         if (localRoot->getRightChild() == NULL)
         {
-            return -1;
+            return false; // Remove failed
         }
 
         // Update height
         // callRemoveNode=false: recursively calls removeFromSubtree()
-        return updateHeightsAndRemove(localRoot,
-                                      localRoot->getRightChildRef(), // rmvTreeRef
-                                      localRoot->getLeftChild(),     // otherTree
-                                      false, data);
+        else
+        {
+            bool out = updateHeightsAndRemove(localRoot,
+                                              localRoot->getRightChildRef(), // rmvTreeRef
+                                              localRoot->getLeftChild(),     // otherTree
+                                              false, data);
+            return out;
+        }
     }
 
     // Case 3: current node
@@ -247,7 +275,8 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         // No left child
         if (localRoot->getLeftChild() == NULL)
         {
-            return removeNode(localRoot);
+            removeNode(localRoot);
+            return true; // Removed node successfully
         }
 
         // Has left child
@@ -255,90 +284,65 @@ int AVL::removeFromSubtree(int data, Node *&localRoot)
         {
             // Update height
             // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
-            return updateHeightsAndRemove(localRoot,
-                                          localRoot->getLeftChildRef(), // rmvTreeRef
-                                          localRoot->getRightChild(),   // otherTree
-                                          true, data);
+            updateHeightsAndRemove(localRoot,
+                                   localRoot->getLeftChildRef(), // rmvTreeRef
+                                   localRoot->getRightChild(),   // otherTree
+                                   true, data);
+
+            return true; // Removed node successfully
         }
     }
 }
 
 /**
- * @brief Updates the height at the given node, recusrively calling the indicated remove funtion.
+ * @brief Updates the height at the given node, recursively calling the indicated remove funtion.
  *
  * @param localRoot The root of the subtree.
- * @param rmvTreeRef The child node tha might contain the value to remove.
+ * @param rmvTreeRef The child node that might contain the value to remove.
  * @param otherTree The other child node.
- * @param callRemoveNode Calls removeNode() if true, otherwise removeFromSubtree()
+ * @param callRemoveNode Calls removeNode() if true, otherwise removeFromSubtree() is called.
  * @param data The value to remove if applicable.
- *
- * @return 1 if removed and heights further up should not be updated
- * @return 0 if removed and heights further up may need to be updated
- * @return -1 if remove is unsuccessful (i.e. the value is not in the tree)
+ * @return true if the value was removed successfully.
+ * @return false otherwise, i.e. if the value is not in the subtree.
  */
-int AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data)
+bool AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data)
 {
-    // Save rmvTree's old height for comparison
-    int prevRmvTreeHeight = rmvTreeRef->getHeight();
 
-    // Recurse down rmvTree
-    int result;
+    // Base case
     if (callRemoveNode)
     {
-        result = removeNode(localRoot);
-    }
-    else
-    {
-        if (!data)
+        removeNode(localRoot);
+        if (otherTree == NULL)
         {
-            std::cerr << "Problem! Called updateHeightsAndRemove() with callRemoveNode=false, but recieved NULL value for data." << std::endl;
-            throw;
+            // TODO Make sure localRoot's parent has its height updated
         }
-
-        result = removeFromSubtree(data, rmvTreeRef);
     }
 
-    // Simply pass along result if either:
-    // removal failed, i.e. data wasn't found (-1)
-    // don't-update-heights flag was recieved (1)
-    if (result != 0)
-    {
-        return result;
-    }
-
-    // Update height if necessary
+    // Recurse down rmvTreeRef
     else
     {
-        bool wasUpdated = updateHeight(localRoot, rmvTreeRef, otherTree, -1);
-        // If this node was NOT updated, flag higher nodes not to change their heights
-        return (!wasUpdated) ? 1 : 0;
+        // Recurse
+        bool removedSuccessfully = removeFromSubtree(data, rmvTreeRef);
 
-        // // If otherTree's height outweighs rmvTree's
-        // // Means this node's height won't change, even if removal succeeded
-        // if (otherTree != NULL && otherTree->getHeight() >= prevRmvTreeHeight)
-        // {
-        //     // Flag higher nodes not to change their heights
-        //     return 1;
-        // }
+        // Return without updating if the remove failed
+        if (!removedSuccessfully)
+        {
 
-        // // If otherTree == NULL
-        // // or its height isn't as large enough to outweigh rmvTree's
-        // else
-        // {
-        //     // Decrement height
-        //     localRoot->setHeight(localRoot->getHeight() - 1);
-        //     return 0;
-        // }
+            return false;
+        }
+        updateHeight(localRoot, rmvTreeRef, otherTree, -1);
     }
+
+    return true;
 }
 
 /**
  * @brief Remove a node and update its subtree.
- * Removes the node at the given reference pointer and updates the pointer to the new local root.
+ * Removes the local root at the given reference pointer and updates the pointer to the new local root. Called as the base case for updateHeightsAndRemove().
  *
- * @param localRoot The node to be removed.
+ * @param localRoot A pointer reference to the node to remove.
  */
-int AVL::removeNode(Node *&localRoot)
+void AVL::removeNode(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -360,8 +364,6 @@ int AVL::removeNode(Node *&localRoot)
             Node *rmvNode = localRoot;
             localRoot = NULL;
             delete rmvNode;
-            // No height updates necessary at this level or lower
-            return 0;
         }
 
         // Case 2: Root has right child only
@@ -370,12 +372,10 @@ int AVL::removeNode(Node *&localRoot)
             Node *rmvNode = localRoot;
             localRoot = right;
             delete rmvNode;
-            // No height updates necessary at this level or lower
-            return 0;
         }
     }
 
-    // Root has left child
+    // Root does have a left child
     else
     {
         // Case 3: Root has left child only
@@ -384,24 +384,23 @@ int AVL::removeNode(Node *&localRoot)
             Node *rmvNode = localRoot;
             localRoot = left;
             delete rmvNode;
-            // No height updates necessary at this level or lower
-            return 0;
         }
 
         // Case 4: Root has left and right children
         else
         {
-            return removeNodeWith2Children(localRoot);
+            removeNodeWith2Children(localRoot);
         }
     }
 }
 
 /**
- * @brief Remove a Node that has both a left and a right child.
+ * @brief Remove a node with two children and update its subtree.
+ * Removes the local root at the given reference pointer and updates the pointer to the new local root. Throws an error if one of the node's children is NULL.
  *
- * @param localRoot
+ * @param localRoot A pointer reference to the node to remove.
  */
-int AVL::removeNodeWith2Children(Node *&localRoot)
+void AVL::removeNodeWith2Children(Node *&localRoot)
 {
 #ifdef DEBUG
     if (localRoot == NULL)
@@ -427,15 +426,13 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
         localRoot = left;
         localRoot->setRightChild(right);
         delete rmvNode;
-        // No height updates necessary at this level or lower
-        return 0;
     }
 
-    // Case 2: left has a right child
+    // Case 2: left does have a right child
     else
     {
         // Find (the parent of) the new root
-        Node *rootParent;
+        Node *rootParent = NULL;
         updateHeightsAndFindReplacement(left, rootParent);
 
         // Delete old root and update localRoot pointer
@@ -449,11 +446,18 @@ int AVL::removeNodeWith2Children(Node *&localRoot)
         // Set new root's children
         localRoot->setLeftChild(left);   // Set new root->left
         localRoot->setRightChild(right); // Set new root->right
-
-        return 0;
     }
 }
 
+/**
+ * @brief Search for the node to replace a removed node, updating heights.
+ * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentNode until finding a node (the parent of the new root node) that has no right-right grandchild. Updates node heights along the way. Requires currentNode->getRightChild() != NULL and rootParent == NULL.
+ *
+ * @param currentNode The current node.
+ * @param rootParent A reference pointer which will be set to point to the parent node of the new root.
+ * @return true if the current node's height was updated.
+ * @return false otherwise, i.e. if the left child's height was much greater than the right child's.
+ */
 bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 {
     // Base case
@@ -476,29 +480,11 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
             return false;
         }
 
-        return updateHeight(currentNode,                  // localRoot
-                            currentNode->getRightChild(), // updateChild
-                            currentNode->getLeftChild(),  // otherChild
-                            -1);                          // increment
-
-        // if (currentNode->getLeftChild() == NULL)
-        // {
-        //     // Update height
-        //     currentNode->setHeight(currentNode->getHeight() - 1);
-        //     return true;
-        // }
-
-        // int lHeight = currentNode->getLeftChild()->getHeight();
-        // int rHeight = currentNode->getRightChild()->getHeight();
-        // if (lHeight > rHeight)
-        // {
-        //     // Left subtree outweighs right. Don't update height
-        //     return false;
-        // }
-
-        // // Update height
-        // currentNode->setHeight(currentNode->getHeight() - 1);
-        // return true;
+        bool result = updateHeight(currentNode,                  // localRoot
+                                   currentNode->getRightChild(), // updateChild
+                                   currentNode->getLeftChild(),  // otherChild
+                                   -1);                          // increment
+        return result;
     }
 }
 
@@ -537,7 +523,11 @@ void AVL::clearSubtree(Node *&localRoot)
 }
 
 ////
+////
+////
 //// toString()
+////
+////
 ////
 
 std::string AVL::toString() const

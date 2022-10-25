@@ -15,14 +15,14 @@ private:
     bool addToSubtree(int data, Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
-    bool updateHeight(Node *node, Node *updateChild, Node *otherChild, int increment);
+    bool updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment);
 
     // Remove helper functions
-    int removeFromSubtree(int data, Node *&localRoot);
-    int updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data);
-    int removeNode(Node *&localRoot);
-    int removeNodeWith2Children(Node *&localRoot);
-    bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rmvLocation);
+    bool removeFromSubtree(int data, Node *&localRoot);
+    bool updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data);
+    void removeNode(Node *&localRoot);
+    void removeNodeWith2Children(Node *&localRoot);
+    bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent);
 
 public:
     AVL();
