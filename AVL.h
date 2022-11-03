@@ -5,6 +5,13 @@
 #include "AVLInterface.h"
 #include "Node.h"
 
+enum Result
+{
+    FAIL = 1,
+    SUCCESS_UPDATE = 2,
+    SUCCESS_NO_UPDATE = 3
+};
+
 class AVL : AVLInterface
 {
 private:
@@ -12,16 +19,16 @@ private:
     int nextId;
 
     void clearSubtree(Node *&localRoot);
-    bool addToSubtree(int data, Node *localRoot);
+    Result addToSubtree(int data, Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
-    bool updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
+    Result updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
 
     bool updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment);
 
     // Remove helper functions
-    bool removeFromSubtree(int data, Node *&localRoot);
-    bool updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data);
+    Result removeFromSubtree(int data, Node *&localRoot);
+    Result updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data);
     void removeNode(Node *&localRoot);
     void removeNodeWith2Children(Node *&localRoot);
     bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent);
