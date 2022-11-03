@@ -294,14 +294,13 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
             return FAIL; // Remove failed
         }
 
-        // Update height
-        // callRemoveNode=false: recursively calls removeFromSubtree()
         else
         {
+            // Update height
             Result result = updateHeightsAndRemove(localRoot,
                                                    localRoot->getLeftChildRef(), // rmvTreeRef
                                                    localRoot->getRightChild(),   // otherTree
-                                                   false, data);
+                                                   data);
 #ifdef DEBUG
             std::cout << "Finished removeFromSubtree(" << data << ", returning updateHeightsAndRemove() result of " << out << std::endl;
 #endif
@@ -323,14 +322,13 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
             return FAIL; // Remove failed
         }
 
-        // Update height
-        // callRemoveNode=false: recursively calls removeFromSubtree()
         else
         {
+            // Update height
             Result result = updateHeightsAndRemove(localRoot,
                                                    localRoot->getRightChildRef(), // rmvTreeRef
                                                    localRoot->getLeftChild(),     // otherTree
-                                                   false, data);
+                                                   data);
 #ifdef DEBUG
             std::cout << "Finished removeFromSubtree(" << data << ", returning updateHeightsAndRemove() value " << out << std::endl;
 #endif
@@ -338,13 +336,13 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
         }
     }
 
-    // Case 3: current node
+    // Case 3: current node is the node to remove
     else
     {
 #ifdef DEBUG
         std::cout << "case 3, ";
 #endif
-        // Node to remove has no left child
+        // Case 3A: Node to remove has no left child
         if (localRoot->getLeftChild() == NULL)
         {
 #ifdef DEBUG
@@ -357,7 +355,7 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
             return SUCCESS_UPDATE; // Removed node successfully
         }
 
-        // Node to remove has left child
+        // Case 3B: Node to remove has left child
         else
         {
 #ifdef DEBUG
@@ -366,74 +364,54 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
             // Update height
             // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
             // TODO Replace with its own code?
-            Result result = updateHeightsAndRemove(localRoot,
-                                                   localRoot->getLeftChildRef(), // rmvTreeRef
-                                                   localRoot->getRightChild(),   // otherTree
-                                                   true, data);
+
+            removeNode(localRoot);
 #ifdef DEBUG
             std::cout << "Finished removeFromSubtree(" << data << "), returning true" << std::endl;
 #endif
-
-            return result; // Removed node successfully
+            return SUCCESS_UPDATE; // Removed node successfully; higher nodes may need to update heights
         }
     }
 }
 
 /**
- * @brief Updates the height at the given node, recursively calling the indicated remove funtion.
+ * @brief Updates the height at the given node, recursively calling removeFromSubtree().
  *
  * @param localRoot The root of the subtree.
  * @param rmvTreeRef The child node that might contain the value to remove.
  * @param otherTree The other child node.
- * @param callRemoveNode Calls removeNode() if true, otherwise removeFromSubtree() is called.
  * @param data The value to remove if applicable.
  * @return true if the value was removed successfully.
  * @return false otherwise, i.e. if the value is not in the subtree.
  */
-Result AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, bool callRemoveNode, int data)
+Result AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data)
 {
 #ifdef DEBUG
     int otherTreeId = (otherTree) ? otherTree->id : -1;
     std::cout << "updateHeightsAndRemove(rootID=" << localRoot->id << ", rmvID=" << rmvTreeRef->id << ", otherID=" << otherTreeId << ", rmvNode=" << callRemoveNode << ", data=" << data << ")" << std::endl;
 #endif
 
-    // Base case
-    if (callRemoveNode)
+    // Recurse
+    Result childResult = removeFromSubtree(data, rmvTreeRef);
+
+    // Return without updating if the remove failed
+    if (childResult == FAIL)
     {
-        // TODO Redesign
-        removeNode(localRoot);
-        if (otherTree == NULL)
-        {
-            // TODO Make sure localRoot's parent has its height updated
-        }
-        return SUCCESS_UPDATE;
+#ifdef DEBUG
+        std::cout << "updateHeightsAndRemove: call to removeFromSubtree returned false, returning false" << std::endl;
+#endif
+        return FAIL;
+    }
+    bool wasHeightUpdated = true;
+    if (childResult == SUCCESS_UPDATE)
+    {
+        wasHeightUpdated = updateHeight(localRoot, rmvTreeRef, otherTree, -1);
     }
 
-    // Recurse down rmvTreeRef
-    else
-    {
-        // Recurse
-        Result childResult = removeFromSubtree(data, rmvTreeRef);
-
-        // Return without updating if the remove failed
-        if (childResult == FAIL)
-        {
 #ifdef DEBUG
-            std::cout << "updateHeightsAndRemove: call to removeFromSubtree returned false, returning false" << std::endl;
+    std::cout << "Finished updateHeightsAndRemove(data=" << data << "), returning true" << std::endl;
 #endif
-            return FAIL;
-        }
-        bool wasHeightUpdated = true;
-        if (childResult == SUCCESS_UPDATE)
-        {
-            wasHeightUpdated = updateHeight(localRoot, rmvTreeRef, otherTree, -1);
-        }
-
-#ifdef DEBUG
-        std::cout << "Finished updateHeightsAndRemove(data=" << data << "), returning true" << std::endl;
-#endif
-        return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
-    }
+    return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
 }
 
 /**
