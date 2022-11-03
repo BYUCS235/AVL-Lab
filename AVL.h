@@ -19,14 +19,18 @@ private:
     int nextId;
 
     void clearSubtree(Node *&localRoot);
-    bool rebalance(Node *pivot);
     bool updateHeight(Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
+
+    // rebalancing functions
+    bool rebalance(Node *&pivot);
+    void rotateLeft(Node *&pivot);
+    void rotateRight(Node *&pivot);
 
     // add() helper functions
     Result addToSubtree(int data, Node *localRoot);
     Result updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
-    
+
     // remove() helper functions
     Result removeFromSubtree(int data, Node *&localRoot);
     Result updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data);
