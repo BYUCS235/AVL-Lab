@@ -67,8 +67,8 @@ int Node::getData() const
 
 int Node::getBalance() const
 {
-    int lHeight = (leftChild == NULL) ? 0 : leftChild->getHeight();
-    int rHeight = (rightChild == NULL) ? 0 : rightChild->getHeight();
+    int lHeight = (leftChild == NULL) ? -1 : leftChild->getHeight();
+    int rHeight = (rightChild == NULL) ? -1 : rightChild->getHeight();
     return rHeight - lHeight;
 }
 
