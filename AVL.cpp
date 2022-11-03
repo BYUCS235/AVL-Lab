@@ -525,6 +525,13 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
         // Set new root's children
         localRoot->setLeftChild(left);   // Set new root->left
         localRoot->setRightChild(right); // Set new root->right
+
+        // Set new root's height
+        updateHeight(localRoot);
+        int lHeight = localRoot->getLeftChild()->getHeight();
+        int rHeight = localRoot->getRightChild()->getHeight();
+        int newHeight = (lHeight > rHeight) ? lHeight + 1 : rHeight + 1;
+        localRoot->setHeight(newHeight);
     }
 }
 
@@ -547,8 +554,12 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
     {
         rootParent = currentNode;
 #ifdef DEBUG
-        std::cout << "current.right.right==NULL, setting rootParent and returning true" << std::endl;
+        std::cout << "current.right.right==NULL, setting rootParent and returning" << std::endl;
 #endif
+        if (currentNode->getLeftChild() != NULL)
+        {
+            return false;
+        }
         return true;
     }
 
