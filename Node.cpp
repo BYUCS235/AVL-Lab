@@ -7,7 +7,7 @@
 Node::Node(int data, int id)
 {
     this->data = data;
-    this->height = 1;
+    this->height = 0;
     this->id = id;
     this->leftChild = NULL;
     this->rightChild = NULL;
@@ -20,14 +20,14 @@ Node::Node(int data, Node *leftChild, Node *rightChild, int id)
     this->leftChild = leftChild;
     this->rightChild = rightChild;
 
-    this->height = 1;
+    this->height = 0;
     if (leftChild != NULL)
     {
         setHeight(leftChild->getHeight() + 1);
     }
     if (rightChild != NULL)
     {
-        if (rightChild->getHeight() + 1 > getHeight())
+        if (rightChild->getHeight() + 1 > this->height)
         {
             setHeight(rightChild->getHeight() + 1);
         }
