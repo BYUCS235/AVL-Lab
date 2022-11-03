@@ -23,7 +23,7 @@ public:
     // getters
     int getData() const;
     int getBalance() const;
-    int getHeight() const;
+    int getHeight();
     Node *getLeftChild() const;
     Node *getRightChild() const;
     Node *&getLeftChildRef();

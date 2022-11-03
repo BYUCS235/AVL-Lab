@@ -77,7 +77,7 @@ int Node::getBalance() const
  *
  * @return int The height of this tree with this node as the local root.
  */
-int Node::getHeight() const
+int Node::getHeight()
 {
     return this->height;
 }
