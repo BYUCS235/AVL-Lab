@@ -19,20 +19,21 @@ private:
     int nextId;
 
     void clearSubtree(Node *&localRoot);
-    Result addToSubtree(int data, Node *localRoot);
+    bool rebalance(Node *pivot);
+    bool updateHeight(Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
+    // add() helper functions
+    Result addToSubtree(int data, Node *localRoot);
     Result updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
-    bool updateRootParentHeight(Node *rootParent);
-
-    bool updateHeight(Node *localRoot);
-
-    // Remove helper functions
+    
+    // remove() helper functions
     Result removeFromSubtree(int data, Node *&localRoot);
     Result updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data);
     void removeNode(Node *&localRoot);
     void removeNodeWith2Children(Node *&localRoot);
     bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent);
+    bool updateRootParentHeight(Node *rootParent);
 
 public:
     AVL();

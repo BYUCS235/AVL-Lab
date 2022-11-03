@@ -30,6 +30,7 @@ Node *AVL::getRootNode() const
 
 ////
 ////
+//    add()
 ////
 ////
 
@@ -129,9 +130,9 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
             localRoot->setRightChild(new Node(data, nextId));
             updateChild = localRoot->getRightChild();
         }
-
-        bool wasHeightUpdated = updateHeight(localRoot);
         this->nextId++;
+        bool wasHeightUpdated = updateHeight(localRoot);
+        // TODO rebalance()
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
     }
     else
@@ -213,7 +214,7 @@ bool AVL::updateHeight(Node *localRoot)
 ////
 ////
 ////
-//// remove()
+//   remove()
 ////
 ////
 ////
@@ -620,8 +621,20 @@ bool AVL::updateRootParentHeight(Node *rootParent)
     return true;
 }
 
+/**
+ * @brief Rebalances the given node's subtree.
+ *
+ * @param pivot The node to pivot around.
+ * @return true if the tree was updated.
+ * @return false if the tree was already balanced and nothing changed.
+ */
+bool AVL::rebalance(Node *pivot)
+{
+    //
+}
+
 ////
-//// clear()
+//   clear()
 ////
 
 /*
@@ -657,7 +670,7 @@ void AVL::clearSubtree(Node *&localRoot)
 ////
 ////
 ////
-//// toString()
+//   toString()
 ////
 ////
 ////
