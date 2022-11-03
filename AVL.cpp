@@ -64,29 +64,36 @@ bool AVL::add(int data)
  */
 Result AVL::addToSubtree(int data, Node *localRoot)
 {
+    Result result;
+
     // Case 1: left subtree
     if (data < localRoot->getData())
     {
-        return updateHeightsAndAddToSubtree(data, localRoot,
-                                            localRoot->getLeftChild(),
-                                            localRoot->getRightChild(), true);
+        result = updateHeightsAndAddToSubtree(data, localRoot,
+                                              localRoot->getLeftChild(),
+                                              localRoot->getRightChild(), true);
     }
 
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
-        return updateHeightsAndAddToSubtree(data, localRoot,
-                                            localRoot->getRightChild(),
-                                            localRoot->getLeftChild(), false);
+        result = updateHeightsAndAddToSubtree(data, localRoot,
+                                              localRoot->getRightChild(),
+                                              localRoot->getLeftChild(), false);
     }
 
     // Case 3: current node (i.e. duplicate)
     else
     {
-        return FAIL; // Failed to add node
+        result = FAIL; // Failed to add node
     }
 
-    // TODO Add() rebalancing
+    if (result == SUCCESS_UPDATE)
+    {
+        rebalance(localRoot);
+    }
+
+    return result;
 }
 
 /**
@@ -120,7 +127,6 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
         }
         this->nextId++;
         bool wasHeightUpdated = updateHeight(localRoot);
-        // TODO rebalance()
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
     }
     else
@@ -227,67 +233,68 @@ bool AVL::remove(int data)
  */
 Result AVL::removeFromSubtree(int data, Node *&localRoot)
 {
-    // Case 0: NULL
+    Result result;
+
     if (localRoot == NULL)
     {
-        return FAIL; // Remove failed
+        // Case 0: NULL
+        result = FAIL; // Remove failed
     }
-
-    // Case 1: left subtree
     else if (data < localRoot->data)
     {
+        // Case 1: left subtree
         if (localRoot->getLeftChild() == NULL)
         {
-            return FAIL; // Remove failed
+            result = FAIL; // Remove failed
         }
-
         else
         {
             // Update height
-            Result result = updateHeightsAndRemove(localRoot,
-                                                   localRoot->getLeftChildRef(), // rmvTreeRef
-                                                   localRoot->getRightChild(),   // otherTree
-                                                   data);
-            return result;
+            result = updateHeightsAndRemove(localRoot,
+                                            localRoot->getLeftChildRef(), // rmvTreeRef
+                                            localRoot->getRightChild(),   // otherTree
+                                            data);
         }
     }
-
-    // Case 2: right subtree
     else if (data > localRoot->data)
     {
+        // Case 2: right subtree
         if (localRoot->getRightChild() == NULL)
         {
-            return FAIL; // Remove failed
+            result = FAIL; // Remove failed
         }
-
         else
         {
             // Update height
-            Result result = updateHeightsAndRemove(localRoot,
-                                                   localRoot->getRightChildRef(), // rmvTreeRef
-                                                   localRoot->getLeftChild(),     // otherTree
-                                                   data);
-            return result;
+            result = updateHeightsAndRemove(localRoot,
+                                            localRoot->getRightChildRef(), // rmvTreeRef
+                                            localRoot->getLeftChild(),     // otherTree
+                                            data);
         }
     }
-
-    // Case 3: current node is the node to remove
     else
     {
-        // Case 3A: Node to remove has no left child
+        // Case 3: current node is the node to remove
         if (localRoot->getLeftChild() == NULL)
         {
+            // Case 3A: Node to remove has no left child
             removeNode(localRoot);
-            return SUCCESS_UPDATE; // Removed node successfully
+            result = SUCCESS_UPDATE; // Removed node successfully
         }
-
-        // Case 3B: Node to remove has left child
         else
         {
+            // Case 3B: Node to remove has left child
             removeNode(localRoot);
-            return SUCCESS_UPDATE; // Removed node successfully; higher nodes may need to update heights
+            result = SUCCESS_UPDATE; // Removed node successfully; higher nodes may need to update heights
         }
     }
+
+    if (result == SUCCESS_UPDATE)
+    {
+        rebalance(localRoot);
+    }
+
+    return result;
 }
 
 /**
@@ -333,38 +340,23 @@ void AVL::removeNode(Node *&localRoot)
     // Root has no left child
     if (left == NULL)
     {
-        // Case 1: Root has no children
-        if (right == NULL)
-        {
-            Node *rmvNode = localRoot;
-            localRoot = NULL;
-            delete rmvNode;
-        }
-
-        // Case 2: Root has right child only
-        else
-        {
-            Node *rmvNode = localRoot;
-            localRoot = right;
-            delete rmvNode;
-        }
+        // Cases 1 and 2: Root has no children/right child only
+        Node *rmvNode = localRoot;
+        localRoot = right;
+        delete rmvNode;
     }
-
-    // Root does have a left child
     else
     {
-        // Case 3: Root has left child only
-
         if (right == NULL)
         {
+            // Case 3: Root has left child only
             Node *rmvNode = localRoot;
             localRoot = left;
             delete rmvNode;
         }
-
-        // Case 4: Root has left and right children
         else
         {
+            // Case 4: Root has left and right children
             removeNodeWith2Children(localRoot);
         }
     }
@@ -490,16 +482,106 @@ bool AVL::updateRootParentHeight(Node *rootParent)
     return true;
 }
 
+////
+//    rebalancing functions
+////
+
 /**
  * @brief Rebalances the given node's subtree.
  *
- * @param pivot The node to pivot around.
+ * @param localRoot The node to rebalance.
  * @return true if the tree was updated.
  * @return false if the tree was already balanced and nothing changed.
  */
-bool AVL::rebalance(Node *pivot)
+bool AVL::rebalance(Node *&localRoot)
 {
-    //
+    if (localRoot->getBalance() >= 2)
+    {
+        if (localRoot->getRightChild()->getBalance() < 0)
+        {
+            // RL tree
+            rotateRight(localRoot->getRightChildRef()); // RL -> RR
+        }
+        // RR tree
+        rotateLeft(localRoot);
+        return true;
+    }
+    else if (localRoot->getBalance() <= -2)
+    {
+        if (localRoot->getLeftChild()->getBalance() > 0)
+        {
+            // LR tree
+            rotateLeft(localRoot->getLeftChildRef()); // LR -> LL
+        }
+        // LL tree
+        rotateRight(localRoot);
+        return true;
+    }
+
+    return false;
+}
+
+// TODO remove tree graphs
+/*
+
+O--R--X--X         R--X--X
+|  |               |
+L  X        ->     O--X
+                   L
+
+O-R-X  ->  R-X
+           O
+
+O--R--X   ->   R--X
+   |           |
+   X           O-X
+
+*/
+
+/**
+ * @brief Rotate the AVL tree left around the given node.
+ * Assumes pivot's right child is non-null.
+ *
+ * @param pivot The node to pivot around.
+ */
+void AVL::rotateLeft(Node *&pivot)
+{
+    Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
+
+    Node *right = origin->getRightChild();
+    Node *center = right->getLeftChild(); // Changes from right's left child to origin's right child
+
+    // Update references
+    origin->setRightChild(center);
+    right->setLeftChild(origin);
+    pivot = right;
+
+    /*
+    O--R--X--X         R--X--X
+    |  |               |
+    X  C        ->     O--C
+                       |
+                       X
+    */
+}
+
+/**
+ * @brief Rotate the AVL tree right around the given node.
+ * Assumes pivot's left child is non-null.
+ *
+ * @param pivot The node to pivot around.
+ */
+void AVL::rotateRight(Node *&pivot)
+{
+    Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
+
+    Node *left = origin->getLeftChild();
+    Node *center = left->getRightChild(); // Changes from left's right child to origin's left child
+
+    // Update references
+    origin->setLeftChild(center);
+    left->setRightChild(origin);
+    pivot = left;
 }
 
 ////
