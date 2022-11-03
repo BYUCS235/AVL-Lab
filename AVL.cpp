@@ -154,7 +154,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
 
 /**
  * @brief Update the height of the given node.
- * Updates height by the given increment, based on the heights of its children.
+ * Updates height based on the heights of its children.
  *
  * Assumes localRoot is not null. Child node args can be null.
  * Assumes child HAS ALREADY been updated by the given amount.
@@ -162,7 +162,6 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
  * @param localRoot The node to update.
  * @param updateChild The child node whose height changed. Does NOT accept null values.
  * @param otherChild The child node whose height did not change. Can be NULL.
- * @param increment The amount by which to increment the height. Either 1 or -1.
  * @return true if this node's height changed.
  * @return false otherwise, i.e. if otherChild's height was much greater than updateChild's.
  */
@@ -502,6 +501,7 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
         localRoot = left;
         localRoot->setRightChild(right);
         delete rmvNode;
+        updateHeight(localRoot);
     }
 
     // Case 2: left does have a right child
@@ -528,16 +528,18 @@ void AVL::removeNodeWith2Children(Node *&localRoot)
 
         // Set new root's height
         updateHeight(localRoot);
-        int lHeight = localRoot->getLeftChild()->getHeight();
-        int rHeight = localRoot->getRightChild()->getHeight();
-        int newHeight = (lHeight > rHeight) ? lHeight + 1 : rHeight + 1;
-        localRoot->setHeight(newHeight);
+        // int lHeight = localRoot->getLeftChild()->getHeight();
+        // int rHeight = localRoot->getRightChild()->getHeight();
+        // int newHeight = (lHeight > rHeight) ? lHeight + 1 : rHeight + 1;
+        // localRoot->setHeight(newHeight);
     }
 }
 
 /**
  * @brief Search for the node to replace a removed node, updating heights.
- * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentNode until finding a node (the parent of the new root node) that has no right-right grandchild. Updates node heights along the way. Requires currentNode->getRightChild() != NULL and rootParent == NULL.
+ * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentNode until finding a node (the parent of the new root node) that has no right-right grandchild. Updates node heights along the way.
+ *
+ * Requires currentNode->getRightChild() != NULL and rootParent == NULL.
  *
  * @param currentNode The current node.
  * @param rootParent A reference pointer which will be set to point to the parent node of the new root.
@@ -549,6 +551,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 #ifdef DEBUG
     std::cout << "updateHeightsAndFindReplacement(id=" << currentNode->id << ")" << std::endl;
 #endif
+
     // Base case
     if (currentNode->getRightChild()->getRightChild() == NULL)
     {
@@ -556,11 +559,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 #ifdef DEBUG
         std::cout << "current.right.right==NULL, setting rootParent and returning" << std::endl;
 #endif
-        if (currentNode->getLeftChild() != NULL)
-        {
-            return false;
-        }
-        return true;
+        return updateRootParentHeight(currentNode);
     }
 
     else
@@ -585,6 +584,40 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 #endif
         return result;
     }
+}
+
+bool AVL::updateRootParentHeight(Node *rootParent)
+{
+    Node *right = rootParent->getRightChild()->getLeftChild();
+    Node *left = rootParent->getLeftChild();
+    int oldHeight = rootParent->getHeight();
+    int newHeight;
+    if (right == NULL && left == NULL)
+    {
+        newHeight = 0;
+    }
+    else if (right == NULL)
+    {
+        newHeight = left->getHeight() + 1;
+    }
+    else if (left == NULL)
+    {
+        newHeight = right->getHeight() + 1;
+    }
+    else
+    {
+        int lHeight = left->getHeight();
+        int rHeight = right->getHeight();
+        newHeight = (lHeight > rHeight) ? lHeight + 1 : rHeight + 1;
+    }
+
+    if (newHeight == oldHeight)
+    {
+        return false;
+    }
+
+    rootParent->setHeight(newHeight);
+    return true;
 }
 
 ////

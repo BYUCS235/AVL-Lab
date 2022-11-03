@@ -119,7 +119,7 @@ void Node::setLeftChild(Node *left)
 std::string Node::toString() const
 {
     std::string str = std::to_string(this->data);
-    str += "(" + std::to_string(this->id) + ")";
+    str += "(" + std::to_string(this->height) + ")";
 
     if (this->leftChild == NULL)
     {

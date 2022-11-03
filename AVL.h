@@ -23,6 +23,7 @@ private:
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
     Result updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
+    bool updateRootParentHeight(Node *rootParent);
 
     bool updateHeight(Node *localRoot);
 
