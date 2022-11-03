@@ -78,7 +78,7 @@ bool AVL::addToSubtree(int data, Node *localRoot)
     // Case 1: left subtree
     if (data < localRoot->getData())
     {
-        updateHeightsAndAddToSubtree(data, localRoot,
+        return updateHeightsAndAddToSubtree(data, localRoot,
                                      localRoot->getLeftChild(),
                                      localRoot->getRightChild(), true);
     }
@@ -86,7 +86,7 @@ bool AVL::addToSubtree(int data, Node *localRoot)
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
-        updateHeightsAndAddToSubtree(data, localRoot,
+        return updateHeightsAndAddToSubtree(data, localRoot,
                                      localRoot->getRightChild(),
                                      localRoot->getLeftChild(), false);
     }
