@@ -66,6 +66,7 @@ bool AVL::add(int data)
 /**
  * @brief Attempt to add the given value to the given subtree.
  * Rebalances the tree if data is successfully added.
+ * Assumes localRoot is not null.
  *
  * @param data
  * @param localRoot
@@ -77,55 +78,17 @@ bool AVL::addToSubtree(int data, Node *localRoot)
     // Case 1: left subtree
     if (data < localRoot->getData())
     {
-        if (localRoot->getLeftChild() == NULL)
-        {
-            localRoot->setLeftChild(new Node(data, nextId));
-            this->nextId++;
-            updateHeight(localRoot,
-                         localRoot->getLeftChild(),  // updateChild
-                         localRoot->getRightChild(), // otherChild
-                         1);
-            return true; // Added node successfully
-        }
-        else
-        {
-            bool addedNodeSuccessfully = addToSubtree(data, localRoot->getLeftChild());
-            if (addedNodeSuccessfully)
-            {
-                updateHeight(localRoot,
-                             localRoot->getLeftChild(),  // updateChild
-                             localRoot->getRightChild(), // otherChild
-                             1);
-            }
-            return addedNodeSuccessfully;
-        }
+        updateHeightsAndAddToSubtree(data, localRoot,
+                                     localRoot->getLeftChild(),
+                                     localRoot->getRightChild(), true);
     }
 
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
-        if (localRoot->getRightChild() == NULL)
-        {
-            localRoot->setRightChild(new Node(data, nextId));
-            updateHeight(localRoot,
-                         localRoot->getRightChild(), // updateChild
-                         localRoot->getLeftChild(),  // otherChild
-                         1);
-            this->nextId++;
-            return true; // Added node successfully
-        }
-        else
-        {
-            bool addedNodeSuccessfully = addToSubtree(data, localRoot->getRightChild());
-            if (addedNodeSuccessfully)
-            {
-                updateHeight(localRoot,
-                             localRoot->getRightChild(), // updateChild
-                             localRoot->getLeftChild(),  // otherChild
-                             1);
-            }
-            return addedNodeSuccessfully;
-        }
+        updateHeightsAndAddToSubtree(data, localRoot,
+                                     localRoot->getRightChild(),
+                                     localRoot->getLeftChild(), false);
     }
 
     // Case 3: current node (i.e. duplicate)
@@ -138,8 +101,55 @@ bool AVL::addToSubtree(int data, Node *localRoot)
 }
 
 /**
+ * @brief Update heights and add the given value to the indicated subtree.
+ * Formatted to use pointers to the child to be updated and the other child
+ * rather than hardcoded left and right. The one exception which requires isLeft
+ * is updating localRoot's child pointers.
+ * 
+ * Assumes localRoot is not null. Child node args can be null.
+ *
+ * @param data
+ * @param localRoot
+ * @return true if added
+ * @return false if unsuccessful (i.e. the value is already in tree)
+ */
+bool AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft)
+{
+    if (updateChild == NULL)
+    {
+        // Only action that requires knowing left vs. right (as opposed to
+        // just using update and other) is updating localRoot's child pointers
+        if (isLeft)
+        {
+            localRoot->setLeftChild(new Node(data, nextId));
+            updateChild = localRoot->getLeftChild();
+        }
+        else
+        {
+            localRoot->setRightChild(new Node(data, nextId));
+            updateChild = localRoot->getRightChild();
+        }
+
+        updateHeight(localRoot, updateChild, otherChild, 1);
+        this->nextId++;
+        return true; // Added node successfully
+    }
+    else
+    {
+        bool addedNodeSuccessfully = addToSubtree(data, updateChild);
+        if (addedNodeSuccessfully)
+        {
+            updateHeight(localRoot, updateChild, otherChild, 1);
+        }
+        return addedNodeSuccessfully;
+    }
+}
+
+/**
  * @brief Update the height of the given node.
  * Updates height by the given increment, based on the heights of its children.
+ * 
+ * Assumes localRoot is not null. Child node args can be null.
  * Assumes child HAS ALREADY been updated by the given amount.
  *
  * @param localRoot The node to update.
