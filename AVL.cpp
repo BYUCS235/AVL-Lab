@@ -193,17 +193,20 @@ bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int
     increment height iff max(prev,post) >= other
     */
 
-    // Find max(old height, new height)
-    int maxHeight = increment > 0 ? updateChild->getHeight() : updateChild->getHeight() - increment;
-    int otherHeight = otherChild->getHeight();
+    // Calculate heights
+    int oldHeight = localRoot->getHeight();
 
-    if (maxHeight >= otherHeight)
+    int updateChildHeight = updateChild->getHeight();
+    int otherChildHeight = otherChild->getHeight();
+    int maxChildHeight = (updateChildHeight > otherChildHeight) ? updateChildHeight : otherChildHeight;
+    int newHeight = maxChildHeight + 1;
+
+    if (newHeight == oldHeight)
     {
-        localRoot->setHeight(localRoot->getHeight() + increment);
-        return true; // Updated height
+        return false; // Did not update height
     }
-
-    return false; // Did not update height
+    localRoot->setHeight(newHeight);
+    return true; // Updated height
 }
 
 ////
