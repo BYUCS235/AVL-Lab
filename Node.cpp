@@ -4,6 +4,11 @@
 #include <iostream>
 #include "Node.h"
 
+Node::Node()
+{
+    //
+}
+
 Node::Node(int data, int id)
 {
     this->data = data;
@@ -46,14 +51,35 @@ Node::~Node()
     }
 }
 
-/*
- * Returns the data that is stored in this node
+////
+//    Getters
+////
+
+/**
+ * @brief Returns the data that is stored in this node.
  *
  * @return the data that is stored in this node.
  */
 int Node::getData() const
 {
     return this->data;
+}
+
+int Node::getBalance() const
+{
+    int lHeight = (leftChild == NULL) ? 0 : leftChild->getHeight();
+    int rHeight = (rightChild == NULL) ? 0 : rightChild->getHeight();
+    return rHeight - lHeight;
+}
+
+/**
+ * @brief Returns the height of this node.
+ *
+ * @return int The height of this tree with this node as the local root.
+ */
+int Node::getHeight() const
+{
+    return this->height;
 }
 
 /*
@@ -106,16 +132,6 @@ Node *&Node::getRightChildRef()
     return this->rightChild;
 }
 
-void Node::setRightChild(Node *right)
-{
-    this->rightChild = right;
-}
-
-void Node::setLeftChild(Node *left)
-{
-    this->leftChild = left;
-}
-
 std::string Node::toString() const
 {
     std::string str = std::to_string(this->data);
@@ -140,26 +156,23 @@ std::string Node::toString() const
     return str;
 }
 
-/**
- * @brief Returns the height of this node.
- *
- * @return int The height of this tree with this node as the local root.
- */
-int Node::getHeight()
+////
+//    setters
+////
+
+void Node::setRightChild(Node *right)
 {
-    return this->height;
+    this->rightChild = right;
+}
+
+void Node::setLeftChild(Node *left)
+{
+    this->leftChild = left;
 }
 
 void Node::setHeight(int height)
 {
     this->height = height;
-}
-
-int Node::getBalance()
-{
-    int lHeight = (leftChild == NULL) ? 0 : leftChild->getHeight();
-    int rHeight = (rightChild == NULL) ? 0 : rightChild->getHeight();
-    return rHeight - lHeight;
 }
 
 #endif

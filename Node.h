@@ -19,17 +19,21 @@ public:
     Node(int data, int id);
     Node(int data, Node *leftChild, Node *rightChild, int id);
     ~Node();
+
+    // getters
     int getData() const;
+    int getBalance() const;
+    int getHeight() const;
     Node *getLeftChild() const;
     Node *getRightChild() const;
     Node *&getLeftChildRef();
     Node *&getRightChildRef();
+    std::string toString() const;
+
+    // setters
     void setLeftChild(Node *left);
     void setRightChild(Node *right);
-    std::string toString() const;
-    int getHeight();
     void setHeight(int height);
-    int getBalance();
 };
 
 #endif
