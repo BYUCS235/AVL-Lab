@@ -361,10 +361,6 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
 #ifdef DEBUG
             std::cout << "has left child" << std::endl;
 #endif
-            // Update height
-            // callRemoveNode=true: calls removeNode() instead of removeFromSubtree()
-            // TODO Replace with its own code?
-
             removeNode(localRoot);
 #ifdef DEBUG
             std::cout << "Finished removeFromSubtree(" << data << "), returning true" << std::endl;
