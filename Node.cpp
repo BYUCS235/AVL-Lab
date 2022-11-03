@@ -155,4 +155,11 @@ void Node::setHeight(int height)
     this->height = height;
 }
 
+int Node::getBalance()
+{
+    int lHeight = (leftChild == NULL) ? 0 : leftChild->getHeight();
+    int rHeight = (rightChild == NULL) ? 0 : rightChild->getHeight();
+    return rHeight - lHeight;
+}
+
 #endif

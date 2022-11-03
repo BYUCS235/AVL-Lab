@@ -29,6 +29,7 @@ public:
     std::string toString() const;
     int getHeight();
     void setHeight(int height);
+    int getBalance();
 };
 
 #endif
