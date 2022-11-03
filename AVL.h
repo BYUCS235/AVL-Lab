@@ -24,7 +24,7 @@ private:
 
     Result updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft);
 
-    bool updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment);
+    bool updateHeight(Node *localRoot);
 
     // Remove helper functions
     Result removeFromSubtree(int data, Node *&localRoot);

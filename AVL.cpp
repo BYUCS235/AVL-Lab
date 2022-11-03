@@ -130,7 +130,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
             updateChild = localRoot->getRightChild();
         }
 
-        bool wasHeightUpdated = updateHeight(localRoot, updateChild, otherChild, 1);
+        bool wasHeightUpdated = updateHeight(localRoot);
         this->nextId++;
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
     }
@@ -146,7 +146,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
         bool wasHeightUpdated = false;
         if (childResult == SUCCESS_UPDATE)
         {
-            wasHeightUpdated = updateHeight(localRoot, updateChild, otherChild, 1);
+            wasHeightUpdated = updateHeight(localRoot);
         }
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
@@ -166,62 +166,47 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
  * @return true if this node's height changed.
  * @return false otherwise, i.e. if otherChild's height was much greater than updateChild's.
  */
-bool AVL::updateHeight(Node *localRoot, Node *updateChild, Node *otherChild, int increment)
+bool AVL::updateHeight(Node *localRoot)
 {
-
-    // Note: assumes child node HAS ALREADY BEEN updated.
-
-    // Check for invalid input
-    if (increment != 1 && increment != -1)
-    {
-        std::cout << "Error: called updateHeight() with the increment not equal to 1 or -1" << std::endl;
-        throw;
-    }
+    Node *left = localRoot->getLeftChild();
+    Node *right = localRoot->getRightChild();
+    int oldHeight = localRoot->getHeight();
+    int newHeight;
 
     // Check for null child nodes
-    if (updateChild == NULL || otherChild == NULL)
+    if (left == NULL && right == NULL)
+    {
+        return false;
+    }
+    else if (right == NULL)
     {
 #ifdef DEBUG
         std::cout << "updateHeight(root=" << localRoot->id << ") (has at least 1 NULL child)" << std::endl;
 #endif
-        localRoot->setHeight(localRoot->getHeight() + increment);
-        return true; // Updated height
+        newHeight = left->getHeight() + 1;
+    }
+    else if (left == NULL)
+    {
+#ifdef DEBUG
+        std::cout << "updateHeight(root=" << localRoot->id << ") (has at least 1 NULL child)" << std::endl;
+#endif
+        newHeight = right->getHeight() + 1;
+    }
+    else
+    {
+        int lHeight = left->getHeight();
+        int rHeight = right->getHeight();
+        int maxChildHeight = (lHeight > rHeight) ? lHeight : rHeight;
+        newHeight = maxChildHeight + 1;
     }
 
-#ifdef DEBUG
-    std::cout << "updateHeight(root=" << localRoot->id << ", u=" << updateChild->id << ", o=" << otherChild->id << ")" << std::endl;
-#endif
-
-    /*
-    All possible combinations
-
-    prev,post, other, increment
-
-    1,2, 0, +   1->2 yes
-    1,2, 1, +   1->2 yes
-    1,2, 2, +   2->2 no
-    1,2, 3, +   3->3 no
-
-    2,1, 0, -   2->1 yes
-    2,1, 1, -   2->1 yes
-    2,1, 2, -   2->2 no
-    2,1, 3, -   3->3 no
-
-    increment height iff max(prev,post) >= other
-    */
-
     // Calculate heights
-    int oldHeight = localRoot->getHeight();
-
-    int updateChildHeight = updateChild->getHeight();
-    int otherChildHeight = otherChild->getHeight();
-    int maxChildHeight = (updateChildHeight > otherChildHeight) ? updateChildHeight : otherChildHeight;
-    int newHeight = maxChildHeight + 1;
 
     if (newHeight == oldHeight)
     {
         return false; // Did not update height
     }
+
     localRoot->setHeight(newHeight);
     return true; // Updated height
 }
@@ -401,7 +386,7 @@ Result AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *ot
     bool wasHeightUpdated = true;
     if (childResult == SUCCESS_UPDATE)
     {
-        wasHeightUpdated = updateHeight(localRoot, rmvTreeRef, otherTree, -1);
+        wasHeightUpdated = updateHeight(localRoot);
     }
 
 #ifdef DEBUG
@@ -583,10 +568,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
             return false;
         }
 
-        bool result = updateHeight(currentNode,                  // localRoot
-                                   currentNode->getRightChild(), // updateChild
-                                   currentNode->getLeftChild(),  // otherChild
-                                   -1);                          // increment
+        bool result = updateHeight(currentNode);
 #ifdef DEBUG
         std::cout << "Finished updateHeightsAndFindReplacement(id=" << currentNode->id << "), returning updateHeight() value of " << result << std::endl;
 #endif
