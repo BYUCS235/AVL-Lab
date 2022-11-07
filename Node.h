@@ -22,6 +22,7 @@ public:
 
     // getters
     int getData() const;
+    std::string getNodeData();
     int getBalance() const;
     int getHeight();
     Node *getLeftChild() const;

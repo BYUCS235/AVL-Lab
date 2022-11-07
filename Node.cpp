@@ -2,6 +2,7 @@
 #define NODE_CPP_T2K_10_17_2022
 
 #include <iostream>
+#include <sstream>
 #include "Node.h"
 
 Node::Node()
@@ -63,6 +64,18 @@ Node::~Node()
 int Node::getData() const
 {
     return this->data;
+}
+
+/**
+ * @brief Returns a string containing data about this node.
+ *
+ * @return a string containing data about this node.
+ */
+std::string Node::getNodeData()
+{
+    std::stringstream ss;
+    ss << getData() << "(h=" << getHeight();
+    return ss.str();
 }
 
 int Node::getBalance() const
