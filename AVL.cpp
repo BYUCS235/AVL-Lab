@@ -139,6 +139,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
         if (childResult == SUCCESS_UPDATE)
         {
             wasHeightUpdated = updateHeight(localRoot);
+            // rebalance(localRoot);
         }
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
@@ -363,6 +364,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
         delete rmvNode;
 
         updateHeight(rmvNodeRef);
+        // rebalance(rmvNodeRef);
     }
 
     // Case 2: left does have a right child
@@ -386,6 +388,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
 
         // Set new root's height
         updateHeight(rmvNodeRef);
+        // rebalance(rmvNodeRef);
     }
 }
 
@@ -414,7 +417,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
         // Recurse
         bool childUpdated = updateHeightsAndFindReplacement(currentNode->getRightChild(), rootParent);
 
-        // Update height if necessary
+        // Update height and rebalance if necessary
 
         if (!childUpdated)
         {
@@ -422,6 +425,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
         }
 
         bool result = updateHeight(currentNode);
+        // rebalance(currentNode);
         return result;
     }
 }
@@ -458,6 +462,108 @@ bool AVL::updateRootParentHeight(Node *rootParent)
 
     rootParent->setHeight(newHeight);
     return true;
+}
+
+////
+//    rebalancing functions
+////
+
+/**
+ * @brief Rebalances the given node's subtree.
+ *
+ * @param localRoot The node to rebalance.
+ * @return true if the tree was updated.
+ * @return false if the tree was already balanced and nothing changed.
+ */
+bool AVL::rebalance(Node *&localRoot)
+{
+    if (localRoot->getBalance() >= 2)
+    {
+        if (localRoot->getRightChild()->getBalance() < 0)
+        {
+            // RL tree
+            rotateRight(localRoot->getRightChildRef()); // RL -> RR
+        }
+        // RR tree
+        rotateLeft(localRoot);
+        return true;
+    }
+    else if (localRoot->getBalance() <= -2)
+    {
+        if (localRoot->getLeftChild()->getBalance() > 0)
+        {
+            // LR tree
+            rotateLeft(localRoot->getLeftChildRef()); // LR -> LL
+        }
+        // LL tree
+        rotateRight(localRoot);
+        return true;
+    }
+
+    return false;
+}
+
+// TODO remove tree graphs
+/*
+
+O--R--X--X         R--X--X
+|  |               |
+L  X        ->     O--X
+                   L
+
+O-R-X  ->  R-X
+           O
+
+O--R--X   ->   R--X
+   |           |
+   X           O-X
+
+*/
+
+/**
+ * @brief Rotate the AVL tree left around the given node.
+ * Assumes pivot's right child is non-null.
+ *
+ * @param pivot The node to pivot around.
+ */
+void AVL::rotateLeft(Node *&pivot)
+{
+    Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
+
+    Node *right = origin->getRightChild();
+    Node *center = right->getLeftChild(); // Changes from right's left child to origin's right child
+
+    // Update references
+    origin->setRightChild(center);
+    right->setLeftChild(origin);
+    pivot = right;
+
+    /*
+    O--R--X--X         R--X--X
+    |  |               |
+    X  C        ->     O--C
+                       |
+                       X
+    */
+}
+
+/**
+ * @brief Rotate the AVL tree right around the given node.
+ * Assumes pivot's left child is non-null.
+ *
+ * @param pivot The node to pivot around.
+ */
+void AVL::rotateRight(Node *&pivot)
+{
+    Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
+
+    Node *left = origin->getLeftChild();
+    Node *center = left->getRightChild(); // Changes from left's right child to origin's left child
+
+    // Update references
+    origin->setLeftChild(center);
+    left->setRightChild(origin);
+    pivot = left;
 }
 
 ////
