@@ -67,7 +67,7 @@ bool AVL::add(int data)
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
  */
-Result AVL::addToSubtree(int data, Node *localRoot)
+Result AVL::addToSubtree(int data, Node *&localRoot)
 {
     Result result;
 
@@ -75,14 +75,14 @@ Result AVL::addToSubtree(int data, Node *localRoot)
     if (data < localRoot->getData())
     {
         result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getLeftChild(), true);
+                                              localRoot->getLeftChildRef(), true);
     }
 
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
         result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getRightChild(), false);
+                                              localRoot->getRightChildRef(), false);
     }
 
     // Case 3: current node (i.e. duplicate)
@@ -108,7 +108,7 @@ Result AVL::addToSubtree(int data, Node *localRoot)
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
  */
-Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, int isLeft)
+Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *updateChild, int isLeft)
 {
     if (updateChild == NULL)
     {
@@ -142,8 +142,8 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
         if (childResult == SUCCESS_UPDATE)
         {
             wasHeightUpdated = updateHeight(localRoot);
-            // FIXME this specific all to rebalance() causes memory leaks
-            // rebalance(localRoot);
+            // FIXME this specific call to rebalance() causes memory leaks
+            rebalance(localRoot);
         }
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }

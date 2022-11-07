@@ -133,11 +133,6 @@ Node *Node::getRightChild() const
  */
 Node *&Node::getLeftChildRef()
 {
-    if (this->leftChild == NULL)
-    {
-        std::cerr << "Error! Called getLeftChildRef() when this->leftChild is NULL" << std::endl;
-        throw;
-    }
     return this->leftChild;
 }
 
@@ -148,11 +143,6 @@ Node *&Node::getLeftChildRef()
  */
 Node *&Node::getRightChildRef()
 {
-    if (this->rightChild == NULL)
-    {
-        std::cerr << "Error! Called getRightChildRef() when this->rightChild is NULL" << std::endl;
-        throw;
-    }
     return this->rightChild;
 }
 
