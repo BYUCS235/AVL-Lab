@@ -74,16 +74,14 @@ Result AVL::addToSubtree(int data, Node *localRoot)
     if (data < localRoot->getData())
     {
         result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getLeftChild(),
-                                              localRoot->getRightChild(), true);
+                                              localRoot->getLeftChild(), true);
     }
 
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
         result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getRightChild(),
-                                              localRoot->getLeftChild(), false);
+                                              localRoot->getRightChild(), false);
     }
 
     // Case 3: current node (i.e. duplicate)
@@ -109,7 +107,7 @@ Result AVL::addToSubtree(int data, Node *localRoot)
  * @return true if added
  * @return false if unsuccessful (i.e. the value is already in tree)
  */
-Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, Node *otherChild, int isLeft)
+Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *updateChild, int isLeft)
 {
     if (updateChild == NULL)
     {
@@ -277,7 +275,7 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
     else
     {
         // Case 3: current node is the node to remove
-        removeNode(localRoot);   // TODO notify higher nodes...?
+        removeNode(localRoot);
         result = SUCCESS_UPDATE; // Removed node successfully
     }
     return result;
