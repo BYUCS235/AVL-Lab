@@ -71,10 +71,10 @@ int Node::getData() const
  *
  * @return a string containing data about this node.
  */
-std::string Node::getNodeData()
+std::string Node::getNodeData() const
 {
     std::stringstream ss;
-    ss << getData() << "(h=" << getHeight();
+    ss << getData() << "(h=" << getNodeHeight();
     return ss.str();
 }
 
@@ -91,6 +91,16 @@ int Node::getBalance() const
  * @return int The height of this tree with this node as the local root.
  */
 int Node::getHeight()
+{
+    return getNodeHeight();
+}
+
+/**
+ * @brief Returns the height of this node.
+ *
+ * @return int The height of this tree with this node as the local root.
+ */
+int Node::getNodeHeight() const
 {
     return this->height;
 }
