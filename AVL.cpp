@@ -172,7 +172,7 @@ bool AVL::updateHeight(Node *localRoot)
     // Check for null child nodes
     if (left == NULL && right == NULL)
     {
-        return false;
+        newHeight = Node::LEAF_HEIGHT;
     }
     else if (right == NULL)
     {
@@ -542,8 +542,12 @@ void AVL::rotateLeft(Node *&pivot)
     right->setLeftChild(origin);
     pivot = right;
 
+    // Update heights
+    updateHeight(origin);
+    updateHeight(right);
+
     /*
-    O--R--X--X         R--X--X
+    O--R--X--X         R--X--X       O=mx(C,X)  R=mx(X,O')
     |  |               |
     X  C        ->     O--C
                        |
@@ -568,6 +572,10 @@ void AVL::rotateRight(Node *&pivot)
     origin->setLeftChild(center);
     left->setRightChild(origin);
     pivot = left;
+
+    // Update heights
+    updateHeight(origin);
+    updateHeight(left);
 }
 
 ////
