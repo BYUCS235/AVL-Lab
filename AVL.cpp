@@ -28,6 +28,10 @@ Node *AVL::getRootNode() const
     return this->root;
 }
 
+Node *&AVL::getRootNodeRef() {
+    return this->root;
+}
+
 ////
 ////
 //    add()

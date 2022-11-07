@@ -22,8 +22,7 @@ private:
     bool updateHeight(Node *localRoot);
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
-    // rebalancing functions
-    bool rebalance(Node *&pivot);
+    // rebalance() helper functions
     void rotateLeft(Node *&pivot);
     void rotateRight(Node *&pivot);
 
@@ -45,8 +44,10 @@ public:
     ~AVL();
 
     Node *getRootNode() const;
+    Node *&getRootNodeRef();
     bool add(int data);
     bool remove(int data);
+    bool rebalance(Node *&pivot);
     void clear();
     std::string toString() const;
 };
