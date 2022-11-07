@@ -20,6 +20,8 @@ public:
     Node(int data, Node *leftChild, Node *rightChild, int id);
     ~Node();
 
+    static const int LEAF_HEIGHT = 0;
+
     // getters
     int getData() const;
     std::string getNodeData() const;

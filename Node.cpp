@@ -13,10 +13,10 @@ Node::Node()
 Node::Node(int data, int id)
 {
     this->data = data;
-    this->height = 0;
     this->id = id;
-    this->leftChild = NULL;
-    this->rightChild = NULL;
+    this->height = LEAF_HEIGHT;
+    setLeftChild(NULL);
+    setRightChild(NULL);
 }
 
 Node::Node(int data, Node *leftChild, Node *rightChild, int id)
