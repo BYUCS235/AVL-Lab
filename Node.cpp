@@ -157,26 +157,28 @@ Node *&Node::getRightChildRef()
 
 std::string Node::toString() const
 {
-    std::string str = std::to_string(this->data);
-    str += "(" + std::to_string(this->height) + ")";
+    std::stringstream ss;
 
     if (this->leftChild == NULL)
     {
-        str += " _";
+        ss << "_";
     }
     else
     {
-        str += " [" + this->leftChild->toString() + "]";
+        ss << "[" + this->leftChild->toString() + "]";
     }
+
+    ss << " " << getNodeData() << " ";
+
     if (this->rightChild == NULL)
     {
-        str += " _";
+        ss << "_";
     }
     else
     {
-        str += " [" + this->rightChild->toString() + "]";
+        ss << "[" + this->rightChild->toString() + "]";
     }
-    return str;
+    return ss.str();
 }
 
 ////
