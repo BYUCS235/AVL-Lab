@@ -74,7 +74,8 @@ int Node::getData() const
 std::string Node::getNodeData() const
 {
     std::stringstream ss;
-    ss << getData() << "(h=" << getNodeHeight();
+    // ss << getData() << "(" << this->id << ",h" << getNodeHeight() << ")";
+    ss << getData() << "(h" << getNodeHeight() << ")";
     return ss.str();
 }
 
