@@ -28,7 +28,8 @@ Node *AVL::getRootNode() const
     return this->root;
 }
 
-Node *&AVL::getRootNodeRef() {
+Node *&AVL::getRootNodeRef()
+{
     return this->root;
 }
 
@@ -141,6 +142,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *localRoot, Node *update
         if (childResult == SUCCESS_UPDATE)
         {
             wasHeightUpdated = updateHeight(localRoot);
+            // FIXME this specific all to rebalance() causes memory leaks
             // rebalance(localRoot);
         }
         return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
@@ -366,7 +368,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
         delete rmvNode;
 
         updateHeight(rmvNodeRef);
-        // rebalance(rmvNodeRef);
+        rebalance(rmvNodeRef);
     }
 
     // Case 2: left does have a right child
@@ -390,7 +392,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
 
         // Set new root's height
         updateHeight(rmvNodeRef);
-        // rebalance(rmvNodeRef);
+        rebalance(rmvNodeRef);
     }
 }
 
@@ -427,7 +429,7 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
         }
 
         bool result = updateHeight(currentNode);
-        // rebalance(currentNode);
+        rebalance(currentNode);
         return result;
     }
 }
