@@ -379,22 +379,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
     else
     {
         // Case 2: left does have a right child
-
-        // Find (the parent of) the new root
-        Node *rootParent = NULL;
-        updateHeightsAndFindReplacement(left, rootParent);
-
-        // Delete old root and update localRoot pointer
-        Node *rmvNode = rmvNodeRef;
-        rmvNodeRef = rootParent->getRightChild();
-        delete rmvNode;
-
-        // Update pointers to remove the new root from its previous location
-        rootParent->setRightChild(rootParent->getRightChild()->getLeftChild());
-
-        // Set new root's children
-        rmvNodeRef->setLeftChild(left);   // Set new root->left
-        rmvNodeRef->setRightChild(right); // Set new root->right
+        removeSwap(rmvNodeRef, left);
     }
 
     // Set new root's height and rebalance
@@ -406,45 +391,47 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
 }
 
 /**
- * @brief Search for the node to replace a removed node, updating heights.
- * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentNode until finding a node (the parent of the new root node) that has no right-right grandchild, then stores it in rootParent and updates rmvNodeRef. Balances nodes along  the way.
+ * @brief Perform a swap on a node to be removed, updating heights and rebalancing.
+ * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentParent until finding a node (the parent of the new root node) that has no right-right grandchild, then stores it in currentParent and updates rmvNodeRef. Balances nodes along  the way.
  *
- * Requires currentNode->getRightChild() != NULL and rootParent == NULL.
+ * Requires currentParent->getRightChild() != NULL and currentParent == NULL.
  *
- * @param currentNode The current node.
- * @param rootParent A reference pointer which will be set to point to the parent node of the new root.
  * @param rmvNodeRef The reference pointer to the node to be removed.
+ * @param currentParent The current node.
  * @return true if the current node's height was updated.
  * @return false otherwise, i.e. if the left child's height was much greater than the right child's.
  */
-bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
+Result AVL::removeSwap(Node *&rmvNodeRef, Node *currentParent)
 {
-    bool heightUpdated = true;
+    Result result = FAIL;
 
-    // Base case: found the new root
-    if (currentNode->getRightChild()->getRightChild() == NULL)
+    // Base case: found the new root's parent
+    if (currentParent->getRightChild()->getRightChild() == NULL)
     {
-        rootParent = currentNode;
-        heightUpdated = updateRootParentHeight(currentNode);
+        Node *&replaceRef = currentParent->getRightChildRef();
+        swapNodes(replaceRef, rmvNodeRef); // Swap rmvNode with replacement node
+        deleteRmvNode(replaceRef);         // Once rmvNode is in replacement location, it can be safely deleted
+        updateHeight(currentParent);
+        result = SUCCESS_UPDATE;
     }
     else
     {
         // Recurse
-        bool childUpdated = updateHeightsAndFindReplacement(currentNode->getRightChild(), rootParent);
+        Result childResult = removeSwap(rmvNodeRef, currentParent->getRightChild());
 
-        // Update height and rebalance if necessary
-
-        if (!childUpdated)
+        if (childResult == SUCCESS_UPDATE)
         {
-            heightUpdated = false;
+            bool heightUpdated = updateHeight(currentParent);
+            // TODO heightUpdated = heightUpdated || rebalance(currentParent);
+            result = (heightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
         }
         else
         {
-            heightUpdated = updateHeight(currentNode);
+            result = childResult;
         }
     }
-    rebalance(currentNode); // TODO Rebalance AFTER updating pointers
-    return heightUpdated;
+
+    return result;
 }
 
 void AVL::swapNodes(Node *&node, Node *&other)
@@ -465,7 +452,8 @@ void AVL::swapNodes(Node *&node, Node *&other)
     other = nodePtr;
 }
 
-void AVL::deleteRmvNode(Node *&rmvNodeRef) {
+void AVL::deleteRmvNode(Node *&rmvNodeRef)
+{
     Node *rmvNode = rmvNodeRef;
     rmvNodeRef = rmvNode->getLeftChild();
     delete rmvNode;
@@ -515,11 +503,13 @@ bool AVL::updateRootParentHeight(Node *rootParent)
  * @brief Rebalances the given node's subtree.
  *
  * @param localRoot The node to rebalance.
- * @return true if the tree was updated.
- * @return false if the tree was already balanced and nothing changed.
+ * @return FAIL if the tree was already balanced and nothing changed.
+ * @return SUCCESS_UPDATE if the tree was updated and the root's height was changed.
+ * @return SUCCESS_NO_UPDATE if the tree was updated but the root's height did not change.
  */
-bool AVL::rebalance(Node *&localRoot)
+Result AVL::rebalance(Node *&localRoot)
 {
+    int oldHeight = localRoot->getHeight();
     if (localRoot->getBalance() >= 2)
     {
         if (localRoot->getRightChild()->getBalance() < 0)
@@ -529,7 +519,7 @@ bool AVL::rebalance(Node *&localRoot)
         }
         // RR tree
         rotateLeft(localRoot);
-        return true;
+        return (localRoot->getHeight() == oldHeight) ? SUCCESS_NO_UPDATE : SUCCESS_UPDATE;
     }
     else if (localRoot->getBalance() <= -2)
     {
@@ -540,10 +530,10 @@ bool AVL::rebalance(Node *&localRoot)
         }
         // LL tree
         rotateRight(localRoot);
-        return true;
+        return (localRoot->getHeight() == oldHeight) ? SUCCESS_NO_UPDATE : SUCCESS_UPDATE;
     }
 
-    return false;
+    return FAIL;
 }
 
 /**

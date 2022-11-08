@@ -23,6 +23,7 @@ private:
     void addSubtreeToSStream(Node *localRoot, std::stringstream &ss, std::string prefix) const;
 
     // rebalance() helper functions
+    Result rebalance(Node *&pivot);
     void rotateLeft(Node *&pivot);
     void rotateRight(Node *&pivot);
 
@@ -35,7 +36,7 @@ private:
     Result updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data);
     void removeNode(Node *&localRoot);
     void removeNodeWith2Children(Node *&localRoot);
-    bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent);
+    Result removeSwap(Node *&rmvNodeRef, Node *currentParent);
     void swapNodes(Node *&node, Node *&other);
     void deleteRmvNode(Node *&rmvNodeRef);
     bool updateHeightsAndReplace(Node *currentNode, Node *&rootParent, Node *&rmvNodeRef);
@@ -49,7 +50,6 @@ public:
     Node *&getRootNodeRef();
     bool add(int data);
     bool remove(int data);
-    bool rebalance(Node *&pivot);
     void clear();
     std::string toString() const;
 };
