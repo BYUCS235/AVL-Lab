@@ -92,7 +92,6 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
         result = FAIL; // Failed to add node
     }
 
-    // TODO Add() rebalancing
     return result;
 }
 
@@ -129,23 +128,20 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&upda
         }
 
         this->nextId++;
-        bool wasHeightUpdated = updateHeight(localRoot);                  // TODO Move to end of function? (Reduce duplicate code)
-        result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
     }
     else
     {
         Result childResult = addToSubtree(data, updateChild);
 
+        // Return without updating if add failed
         if (childResult == FAIL)
         {
-            result = FAIL;
-        }
-        else
-        {
-            bool wasHeightUpdated = updateHeight(localRoot);
-            result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
+            return FAIL;
         }
     }
+
+    bool wasHeightUpdated = updateHeight(localRoot);
+    result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
 
     if (localRoot != NULL)
     {
@@ -403,7 +399,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
 
     // Set new root's height and rebalance
     updateHeight(rmvNodeRef);
-    if (rmvNodeRef != NULL) // TODO Unneeded null check...?
+    if (rmvNodeRef != NULL)
     {
         rebalance(rmvNodeRef);
     }
