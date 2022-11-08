@@ -28,7 +28,7 @@ private:
 
     // add() helper functions
     Result addToSubtree(int data, Node *&localRoot);
-    Result updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *updateChild, int isLeft);
+    Result updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&updateChild, int isLeft);
 
     // remove() helper functions
     Result removeFromSubtree(int data, Node *&localRoot);
