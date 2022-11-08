@@ -54,7 +54,8 @@ bool AVL::add(int data)
         this->nextId++;
         return true;
     }
-    return addToSubtree(data, this->root);
+    Result result = addToSubtree(data, this->root);
+    return result != FAIL;
 }
 
 /**
@@ -110,6 +111,8 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
  */
 Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&updateChild, int isLeft)
 {
+    Result result = FAIL;
+
     if (updateChild == NULL)
     {
         // Only action that requires knowing left vs. right (as opposed to
@@ -125,9 +128,9 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&upda
             updateChild = localRoot->getRightChild();
         }
 
-        bool wasHeightUpdated = updateHeight(localRoot);
         this->nextId++;
-        return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
+        bool wasHeightUpdated = updateHeight(localRoot);                  // TODO Move to end of function? (Reduce duplicate code)
+        result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
     }
     else
     {
@@ -135,18 +138,21 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&upda
 
         if (childResult == FAIL)
         {
-            return FAIL;
+            result = FAIL;
         }
-
-        bool wasHeightUpdated = false;
-        if (childResult == SUCCESS_UPDATE)
+        else
         {
-            wasHeightUpdated = updateHeight(localRoot);
-            // FIXME this specific call to rebalance() causes memory leaks
-            rebalance(localRoot);
+            bool wasHeightUpdated = updateHeight(localRoot);
+            result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
         }
-        return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
+
+    if (localRoot != NULL)
+    {
+        rebalance(localRoot);
+    }
+
+    return result;
 }
 
 /**
@@ -300,21 +306,22 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
  */
 Result AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data)
 {
+    Result result;
+
     // Recurse
     Result childResult = removeFromSubtree(data, rmvTreeRef);
 
-    // Return without updating if the remove failed
     if (childResult == FAIL)
     {
-        return FAIL;
+        result = FAIL;
     }
-    bool wasHeightUpdated = true;
-    if (childResult == SUCCESS_UPDATE)
+    else
     {
-        wasHeightUpdated = updateHeight(localRoot);
+        bool wasHeightUpdated = updateHeight(localRoot);
+        result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
 
-    return (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
+    return result;
 }
 
 /**
@@ -372,9 +379,6 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
         rmvNodeRef = left;
         rmvNodeRef->setRightChild(right);
         delete rmvNode;
-
-        updateHeight(rmvNodeRef);
-        rebalance(rmvNodeRef);
     }
     else
     {
@@ -395,9 +399,12 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
         // Set new root's children
         rmvNodeRef->setLeftChild(left);   // Set new root->left
         rmvNodeRef->setRightChild(right); // Set new root->right
+    }
 
-        // Set new root's height
-        updateHeight(rmvNodeRef);
+    // Set new root's height and rebalance
+    updateHeight(rmvNodeRef);
+    if (rmvNodeRef != NULL) // TODO Unneeded null check...?
+    {
         rebalance(rmvNodeRef);
     }
 }
@@ -416,11 +423,13 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
  */
 bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 {
+    bool heightUpdated = true;
+
     // Base case: found the new root
     if (currentNode->getRightChild()->getRightChild() == NULL)
     {
         rootParent = currentNode;
-        return updateRootParentHeight(currentNode);
+        heightUpdated = updateRootParentHeight(currentNode);
     }
     else
     {
@@ -431,13 +440,15 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
 
         if (!childUpdated)
         {
-            return false;
+            heightUpdated = false;
         }
-
-        bool result = updateHeight(currentNode);
-        rebalance(currentNode);
-        return result;
+        else
+        {
+            heightUpdated = updateHeight(currentNode);
+        }
     }
+    rebalance(currentNode); // TODO Rebalance AFTER updating pointers
+    return heightUpdated;
 }
 
 bool AVL::updateRootParentHeight(Node *rootParent)
