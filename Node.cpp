@@ -81,8 +81,8 @@ std::string Node::getNodeData() const
 
 int Node::getBalance() const
 {
-    int lHeight = (leftChild == NULL) ? -1 : leftChild->getHeight();
-    int rHeight = (rightChild == NULL) ? -1 : rightChild->getHeight();
+    int lHeight = (leftChild == NULL) ? Node::LEAF_HEIGHT - 1 : leftChild->getHeight();
+    int rHeight = (rightChild == NULL) ? Node::LEAF_HEIGHT - 1 : rightChild->getHeight();
     return rHeight - lHeight;
 }
 
