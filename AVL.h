@@ -36,6 +36,8 @@ private:
     void removeNode(Node *&localRoot);
     void removeNodeWith2Children(Node *&localRoot);
     bool updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent);
+    void swapNodes(Node *&node, Node *&other);
+    void deleteRmvNode(Node *&rmvNodeRef);
     bool updateHeightsAndReplace(Node *currentNode, Node *&rootParent, Node *&rmvNodeRef);
     bool updateRootParentHeight(Node *rootParent);
 

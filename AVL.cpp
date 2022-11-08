@@ -447,8 +447,33 @@ bool AVL::updateHeightsAndFindReplacement(Node *currentNode, Node *&rootParent)
     return heightUpdated;
 }
 
+void AVL::swapNodes(Node *&node, Node *&other)
+{
+    // Save node's children
+    Node *nodeL = node->getLeftChild();
+    Node *nodeR = node->getRightChild();
+
+    // Swap children
+    node->setLeftChild(other->getLeftChild());
+    node->setRightChild(other->getRightChild());
+    other->setLeftChild(nodeL);
+    other->setRightChild(nodeR);
+
+    // Update parent references
+    Node *nodePtr = node; // Save pointer, not ref
+    node = other;
+    other = nodePtr;
+}
+
+void AVL::deleteRmvNode(Node *&rmvNodeRef) {
+    Node *rmvNode = rmvNodeRef;
+    rmvNodeRef = rmvNode->getLeftChild();
+    delete rmvNode;
+}
+
 bool AVL::updateRootParentHeight(Node *rootParent)
 {
+    // TODO Remove and replace with updateHeight()?
     Node *right = rootParent->getRightChild()->getLeftChild();
     Node *left = rootParent->getLeftChild();
     int oldHeight = rootParent->getHeight();
