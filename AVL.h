@@ -36,7 +36,7 @@ private:
     Result updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data);
     void removeNode(Node *&localRoot);
     void removeNodeWith2Children(Node *&localRoot);
-    Result removeSwap(Node *&rmvNodeRef, Node *currentParent);
+    Result removeSwap(Node *&rmvNodeRef, Node *&currentParent);
     void swapNodes(Node *&node, Node *&other);
     void deleteRmvNode(Node *&rmvNodeRef);
     bool updateHeightsAndReplace(Node *currentNode, Node *&rootParent, Node *&rmvNodeRef);

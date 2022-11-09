@@ -401,7 +401,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
  * @return true if the current node's height was updated.
  * @return false otherwise, i.e. if the left child's height was much greater than the right child's.
  */
-Result AVL::removeSwap(Node *&rmvNodeRef, Node *currentParent)
+Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
 {
     Result result = FAIL;
 
@@ -411,24 +411,18 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *currentParent)
         Node *&replaceRef = currentParent->getRightChildRef();
         swapNodes(replaceRef, rmvNodeRef); // Swap rmvNode with replacement node
         deleteRmvNode(replaceRef);         // Once rmvNode is in replacement location, it can be safely deleted
-        updateHeight(currentParent);
-        result = SUCCESS_UPDATE;
     }
     else
     {
         // Recurse
-        Result childResult = removeSwap(rmvNodeRef, currentParent->getRightChild());
+        result = removeSwap(rmvNodeRef, currentParent->getRightChildRef());
+    }
 
-        if (childResult == SUCCESS_UPDATE)
-        {
-            bool heightUpdated = updateHeight(currentParent);
-            // TODO heightUpdated = heightUpdated || rebalance(currentParent);
-            result = (heightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
-        }
-        else
-        {
-            result = childResult;
-        }
+    if (result == SUCCESS_UPDATE)
+    {
+        bool heightUpdated = updateHeight(currentParent);
+        heightUpdated = heightUpdated || rebalance(currentParent);
+        result = (heightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
 
     return result;
