@@ -362,7 +362,8 @@ void AVL::removeNode(Node *&rmvNodeRef)
 
 /**
  * @brief Remove a node with two children and update its subtree.
- * Removes the local root at the given reference pointer and updates the pointer to the new local root. Throws an error if one of the node's children is NULL.
+ * Removes the local root at the given reference pointer and updates the pointer to the new local root.
+ * Assumes rmvNodeRef and both of its children are non-NULL.
  *
  * @param rmvNodeRef A pointer reference to the node to remove.
  */
@@ -383,7 +384,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
     else
     {
         // Case 2: left does have a right child
-        removeSwap(rmvNodeRef, left);
+        removeSwap(rmvNodeRef, rmvNodeRef->getLeftChildRef());
     }
 
     // Set new root's height and rebalance
