@@ -4,6 +4,8 @@
 #include <iostream>
 #include "AVL.h"
 
+std::string cprint(Node *node);
+
 AVL::AVL()
 {
     this->root = NULL;
@@ -166,6 +168,7 @@ Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&upda
  */
 bool AVL::updateHeight(Node *localRoot)
 {
+    std::cout << "\tupdateHeight() - localRoot: " << cprint(localRoot) << std::endl;
     Node *left = localRoot->getLeftChild();
     Node *right = localRoot->getRightChild();
     int oldHeight = localRoot->getHeight();
@@ -222,6 +225,7 @@ bool AVL::updateHeight(Node *localRoot)
  */
 bool AVL::remove(int data)
 {
+    std::cout << "\tremove(" << data << ")" << std::endl;
     Result result = removeFromSubtree(data, this->root);
     return result != FAIL;
 }
@@ -390,6 +394,14 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
     }
 }
 
+std::string cprint(Node *node)
+{
+    if (node == NULL)
+        return "NULL";
+
+    return std::to_string(node->getData());
+}
+
 /**
  * @brief Perform a swap on a node to be removed, updating heights and rebalancing.
  * Originally called on the left child of the node to be removed. Recursively searches down the right subtree of currentParent until finding a node (the parent of the new root node) that has no right-right grandchild, then stores it in currentParent and updates rmvNodeRef. Balances nodes along  the way.
@@ -405,17 +417,30 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
 {
     Result result = FAIL;
 
+    std::cout << "\tremoveSwap() - rmvNodeRef: " << cprint(rmvNodeRef) << ", currentParent: " << cprint(currentParent) << std::endl;
+
     // Base case: found the new root's parent
     if (currentParent->getRightChild()->getRightChild() == NULL)
     {
+        std::cout << "\tBase case: found the new root's parent" << std::endl;
         Node *&replaceRef = currentParent->getRightChildRef();
         swapNodes(replaceRef, rmvNodeRef); // Swap rmvNode with replacement node
         deleteRmvNode(replaceRef);         // Once rmvNode is in replacement location, it can be safely deleted
+        if (currentParent == NULL)
+        {
+            std::cout << "currentParent after base case is NULL" << std::endl;
+        }
     }
     else
     {
         // Recurse
+        std::cout << "\tRecursing" << std::endl;
         result = removeSwap(rmvNodeRef, currentParent->getRightChildRef());
+
+        if (currentParent == NULL)
+        {
+            std::cout << "currentParent after recursing is NULL" << std::endl;
+        }
     }
 
     if (result == SUCCESS_UPDATE)
@@ -430,6 +455,7 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
 
 void AVL::swapNodes(Node *&node, Node *&other)
 {
+    std::cout << "\tswapNodes() - node " << cprint(node) << ", other " << cprint(other) << std::endl;
     // Save node's children
     Node *nodeL = node->getLeftChild();
     Node *nodeR = node->getRightChild();
@@ -444,6 +470,8 @@ void AVL::swapNodes(Node *&node, Node *&other)
     Node *nodePtr = node; // Save pointer, not ref
     node = other;
     other = nodePtr;
+
+    std::cout << "\tdone with swapNodes, refs are now: node " << cprint(node) << ", other " << cprint(other) << std::endl;
 }
 
 void AVL::deleteRmvNode(Node *&rmvNodeRef)
@@ -503,6 +531,7 @@ bool AVL::updateRootParentHeight(Node *rootParent)
  */
 Result AVL::rebalance(Node *&localRoot)
 {
+    std::cout << "\trebalance() - localRoot: " << cprint(localRoot) << std::endl;
     int oldHeight = localRoot->getHeight();
     if (localRoot->getBalance() >= 2)
     {
@@ -538,6 +567,7 @@ Result AVL::rebalance(Node *&localRoot)
  */
 void AVL::rotateLeft(Node *&pivot)
 {
+    std::cout << "\trotateLeft()" << std::endl;
     Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
 
     Node *right = origin->getRightChild();
@@ -561,6 +591,7 @@ void AVL::rotateLeft(Node *&pivot)
  */
 void AVL::rotateRight(Node *&pivot)
 {
+    std::cout << "\trotateRight()" << std::endl;
     Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
 
     Node *left = origin->getLeftChild();
