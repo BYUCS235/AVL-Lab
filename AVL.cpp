@@ -256,11 +256,7 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
         }
         else
         {
-            // Update height
-            result = updateHeightsAndRemove(localRoot,
-                                            localRoot->getLeftChildRef(), // rmvTreeRef
-                                            localRoot->getRightChild(),   // otherTree
-                                            data);
+            result = removeFromSubtree(data, localRoot->getLeftChildRef());
         }
     }
     else if (data > localRoot->data)
@@ -272,11 +268,7 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
         }
         else
         {
-            // Update height
-            result = updateHeightsAndRemove(localRoot,
-                                            localRoot->getRightChildRef(), // rmvTreeRef
-                                            localRoot->getLeftChild(),     // otherTree
-                                            data);
+            result = removeFromSubtree(data, localRoot->getRightChildRef());
         }
     }
     else
@@ -288,37 +280,8 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
 
     if (localRoot != NULL)
     {
+        updateHeight(localRoot);
         rebalance(localRoot);
-    }
-
-    return result;
-}
-
-/**
- * @brief Updates the height at the given node, recursively calling removeFromSubtree().
- *
- * @param localRoot The root of the subtree.
- * @param rmvTreeRef The child node that might contain the value to remove.
- * @param otherTree The other child node.
- * @param data The value to remove if applicable.
- * @return true if the value was removed successfully.
- * @return false otherwise, i.e. if the value is not in the subtree.
- */
-Result AVL::updateHeightsAndRemove(Node *&localRoot, Node *&rmvTreeRef, Node *otherTree, int data)
-{
-    Result result;
-
-    // Recurse
-    Result childResult = removeFromSubtree(data, rmvTreeRef);
-
-    if (childResult == FAIL)
-    {
-        result = FAIL;
-    }
-    else
-    {
-        bool wasHeightUpdated = updateHeight(localRoot);
-        result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
     }
 
     return result;
