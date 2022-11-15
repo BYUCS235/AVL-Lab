@@ -251,26 +251,27 @@ void AVL::removeNode(Node *&rmvNodeRef)
 
     // Root has no left child
     if (left == NULL)
+    // Node to remove has no left child
     {
-        // Cases 1 and 2: Root has no children/right child only (no rebalance needed?)
         Node *rmvNode = rmvNodeRef;
         rmvNodeRef = right;
         delete rmvNode;
     }
     else
+    // Node to remove does have a left child
     {
-        if (right == NULL)
+        if (left->getRightChild() != NULL) // Left has a right child
         {
-            // Case 3: Root has left child only (no rebalance needed?)
+            removeSwap(rmvNodeRef, rmvNodeRef->getLeftChildRef());
+        }
+        else // Left does not have a right child
+        {
             Node *rmvNode = rmvNodeRef;
             rmvNodeRef = left;
+            rmvNodeRef->setRightChild(right);
             delete rmvNode;
         }
-        else
-        {
-            // Case 4: Root has left and right children
-            removeNodeWith2Children(rmvNodeRef);
-        }
+        rebalance(rmvNodeRef);
     }
 }
 
