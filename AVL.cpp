@@ -74,18 +74,23 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
 {
     Result result;
 
+    // Case 0: NULL
+    if (localRoot == NULL) {
+        localRoot = new Node(data, nextId);
+        nextId++;
+        result = SUCCESS_UPDATE;
+    }
+
     // Case 1: left subtree
-    if (data < localRoot->getData())
+    else if (data < localRoot->getData())
     {
-        result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getLeftChildRef(), true);
+        result = addToSubtree(data, localRoot->getLeftChildRef());
     }
 
     // Case 2: right subtree
     else if (data > localRoot->getData())
     {
-        result = updateHeightsAndAddToSubtree(data, localRoot,
-                                              localRoot->getRightChildRef(), false);
+        result = addToSubtree(data, localRoot->getRightChildRef());
     }
 
     // Case 3: current node (i.e. duplicate)
@@ -94,61 +99,7 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
         result = FAIL; // Failed to add node
     }
 
-    return result;
-}
-
-/**
- * @brief Update heights and add the given value to the indicated subtree.
- * Formatted to use pointers to the child to be updated and the other child
- * rather than hardcoded left and right. The one exception which requires isLeft
- * is updating localRoot's child pointers.
- *
- * Assumes localRoot is not null. Child node args can be null.
- *
- * @param data
- * @param localRoot
- * @return true if added
- * @return false if unsuccessful (i.e. the value is already in tree)
- */
-Result AVL::updateHeightsAndAddToSubtree(int data, Node *&localRoot, Node *&updateChild, int isLeft)
-{
-    Result result = FAIL;
-
-    if (updateChild == NULL)
-    {
-        // Only action that requires knowing left vs. right (as opposed to
-        // just using update and other) is updating localRoot's child pointers
-        if (isLeft)
-        {
-            localRoot->setLeftChild(new Node(data, nextId));
-            updateChild = localRoot->getLeftChild();
-        }
-        else
-        {
-            localRoot->setRightChild(new Node(data, nextId));
-            updateChild = localRoot->getRightChild();
-        }
-
-        this->nextId++;
-    }
-    else
-    {
-        Result childResult = addToSubtree(data, updateChild);
-
-        // Return without updating if add failed
-        if (childResult == FAIL)
-        {
-            return FAIL;
-        }
-    }
-
-    bool wasHeightUpdated = updateHeight(localRoot);
-    result = (wasHeightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE; // Added node successfully
-
-    if (localRoot != NULL)
-    {
-        rebalance(localRoot);
-    }
+    rebalance(localRoot);
 
     return result;
 }
@@ -350,12 +301,7 @@ void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
         removeSwap(rmvNodeRef, rmvNodeRef->getLeftChildRef());
     }
 
-    // Set new root's height and rebalance
-    updateHeight(rmvNodeRef);
-    if (rmvNodeRef != NULL)
-    {
-        rebalance(rmvNodeRef);
-    }
+    rebalance(rmvNodeRef);
 }
 
 std::string cprint(Node *node)
@@ -495,6 +441,11 @@ bool AVL::updateRootParentHeight(Node *rootParent)
  */
 Result AVL::rebalance(Node *&localRoot)
 {
+    if (localRoot == NULL) {
+        return FAIL;
+    }
+    updateHeight(localRoot);
+
     std::cout << "\trebalance() - localRoot: " << cprint(localRoot) << std::endl;
     int oldHeight = localRoot->getHeight();
     if (localRoot->getBalance() >= 2)
