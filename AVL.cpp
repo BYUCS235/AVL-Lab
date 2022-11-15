@@ -75,7 +75,8 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
     Result result;
 
     // Case 0: NULL
-    if (localRoot == NULL) {
+    if (localRoot == NULL)
+    {
         localRoot = new Node(data, nextId);
         nextId++;
         result = SUCCESS_UPDATE;
@@ -249,7 +250,6 @@ void AVL::removeNode(Node *&rmvNodeRef)
     Node *left = rmvNodeRef->getLeftChild();
     Node *right = rmvNodeRef->getRightChild();
 
-    // Root has no left child
     if (left == NULL)
     // Node to remove has no left child
     {
@@ -354,12 +354,7 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
         }
     }
 
-    if (result == SUCCESS_UPDATE)
-    {
-        bool heightUpdated = updateHeight(currentParent);
-        heightUpdated = heightUpdated || rebalance(currentParent);
-        result = (heightUpdated) ? SUCCESS_UPDATE : SUCCESS_NO_UPDATE;
-    }
+    rebalance(currentParent);
 
     return result;
 }
@@ -406,7 +401,8 @@ void AVL::deleteRmvNode(Node *&rmvNodeRef)
  */
 Result AVL::rebalance(Node *&localRoot)
 {
-    if (localRoot == NULL) {
+    if (localRoot == NULL)
+    {
         return FAIL;
     }
     updateHeight(localRoot);
