@@ -391,42 +391,6 @@ void AVL::deleteRmvNode(Node *&rmvNodeRef)
     delete rmvNode;
 }
 
-bool AVL::updateRootParentHeight(Node *rootParent)
-{
-    // TODO Remove and replace with updateHeight()?
-    Node *right = rootParent->getRightChild()->getLeftChild();
-    Node *left = rootParent->getLeftChild();
-    int oldHeight = rootParent->getHeight();
-    int newHeight;
-
-    if (right == NULL && left == NULL) // No children
-    {
-        newHeight = 0;
-    }
-    else if (right == NULL) // Left child only
-    {
-        newHeight = left->getHeight() + 1;
-    }
-    else if (left == NULL) // Right child only
-    {
-        newHeight = right->getHeight() + 1;
-    }
-    else // Two children
-    {
-        int lHeight = left->getHeight();
-        int rHeight = right->getHeight();
-        newHeight = (lHeight > rHeight) ? lHeight + 1 : rHeight + 1;
-    }
-
-    if (newHeight == oldHeight)
-    {
-        return false;
-    }
-
-    rootParent->setHeight(newHeight);
-    return true;
-}
-
 ////
 //    rebalancing functions
 ////

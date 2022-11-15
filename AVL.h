@@ -37,8 +37,6 @@ private:
     Result removeSwap(Node *&rmvNodeRef, Node *&currentParent);
     void swapNodes(Node *&node, Node *&other);
     void deleteRmvNode(Node *&rmvNodeRef);
-    bool updateHeightsAndReplace(Node *currentNode, Node *&rootParent, Node *&rmvNodeRef);
-    bool updateRootParentHeight(Node *rootParent);
 
 public:
     AVL();
