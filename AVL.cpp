@@ -228,6 +228,8 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
         result = SUCCESS_UPDATE; // Removed node successfully
     }
 
+    rebalance(localRoot);
+
     return result;
 }
 
