@@ -293,9 +293,39 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
     // Base case: found the new root's parent
     if (currentParent->getRightChild()->getRightChild() == NULL)
     {
+        Node *parentPtr = currentParent;
         Node *&replaceRef = currentParent->getRightChildRef();
-        swapNodes(replaceRef, rmvNodeRef); // Swap rmvNode with replacement node
-        deleteRmvNode(replaceRef);         // Once rmvNode is in replacement location, it can be safely deleted
+
+        ////
+        ////
+        ////
+        ////
+
+        // Swap replaceRef and rmvNodeRef
+
+        // Save replaceRef's children
+        Node *nodeL = replaceRef->getLeftChild();
+        Node *nodeR = replaceRef->getRightChild();
+
+        // Swap children
+        replaceRef->setLeftChild(rmvNodeRef->getLeftChild());
+        replaceRef->setRightChild(rmvNodeRef->getRightChild());
+        rmvNodeRef->setLeftChild(nodeL);
+        rmvNodeRef->setRightChild(nodeR);
+
+        // Update parent references
+        Node *nodePtr = replaceRef; // Save pointer, not ref
+        replaceRef = rmvNodeRef;
+        rmvNodeRef = nodePtr;
+
+        // currentParent = parentPtr;
+
+        ////
+        ////
+        ////
+        ////
+
+        deleteRmvNode(replaceRef); // Once rmvNode is in replacement location, it can be safely deleted
     }
     else
     {
@@ -306,24 +336,6 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
     rebalance(currentParent);
 
     return result;
-}
-
-void AVL::swapNodes(Node *&node, Node *&other)
-{
-    // Save node's children
-    Node *nodeL = node->getLeftChild();
-    Node *nodeR = node->getRightChild();
-
-    // Swap children
-    node->setLeftChild(other->getLeftChild());
-    node->setRightChild(other->getRightChild());
-    other->setLeftChild(nodeL);
-    other->setRightChild(nodeR);
-
-    // Update parent references
-    Node *nodePtr = node; // Save pointer, not ref
-    node = other;
-    other = nodePtr;
 }
 
 void AVL::deleteRmvNode(Node *&rmvNodeRef)

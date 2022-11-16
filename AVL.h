@@ -34,7 +34,6 @@ private:
     Result removeFromSubtree(int data, Node *&localRoot);
     void removeNode(Node *&localRoot);
     Result removeSwap(Node *&rmvNodeRef, Node *&currentParent);
-    void swapNodes(Node *&node, Node *&other);
     void deleteRmvNode(Node *&rmvNodeRef);
 
 public:
