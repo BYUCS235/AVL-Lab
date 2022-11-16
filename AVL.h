@@ -33,7 +33,7 @@ private:
     // remove() helper functions
     Result removeFromSubtree(int data, Node *&localRoot);
     void removeNode(Node *&localRoot);
-    Result removeSwap(Node *&rmvNodeRef, Node *&currentParent);
+    Result removeSwap(Node *&rmvNodeRef, Node *currentParent);
     void deleteRmvNode(Node *&rmvNodeRef);
 
 public:

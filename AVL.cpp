@@ -286,7 +286,7 @@ std::string cprint(Node *node)
  * @return true if the current node's height was updated.
  * @return false otherwise, i.e. if the left child's height was much greater than the right child's.
  */
-Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
+Result AVL::removeSwap(Node *&rmvNodeRef, Node *currentParent)
 {
     Result result = FAIL;
 
@@ -333,7 +333,7 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
         result = removeSwap(rmvNodeRef, currentParent->getRightChildRef());
     }
 
-    rebalance(currentParent);
+    // rebalance(currentParent);
 
     return result;
 }
