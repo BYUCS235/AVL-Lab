@@ -267,8 +267,6 @@ void AVL::removeNode(Node *&rmvNodeRef)
     }
 }
 
-
-
 std::string cprint(Node *node)
 {
     if (node == NULL)
