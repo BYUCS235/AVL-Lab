@@ -120,7 +120,6 @@ Result AVL::addToSubtree(int data, Node *&localRoot)
  */
 bool AVL::updateHeight(Node *localRoot)
 {
-    std::cout << "\tupdateHeight() - localRoot: " << cprint(localRoot) << std::endl;
     Node *left = localRoot->getLeftChild();
     Node *right = localRoot->getRightChild();
     int oldHeight = localRoot->getHeight();
@@ -177,7 +176,6 @@ bool AVL::updateHeight(Node *localRoot)
  */
 bool AVL::remove(int data)
 {
-    std::cout << "\tremove(" << data << ")" << std::endl;
     Result result = removeFromSubtree(data, this->root);
     return result != FAIL;
 }
@@ -229,8 +227,6 @@ Result AVL::removeFromSubtree(int data, Node *&localRoot)
         removeNode(localRoot);
         result = SUCCESS_UPDATE; // Removed node successfully
     }
-
-    rebalance(localRoot);
 
     return result;
 }
@@ -324,30 +320,17 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
 {
     Result result = FAIL;
 
-    std::cout << "\tremoveSwap() - rmvNodeRef: " << cprint(rmvNodeRef) << ", currentParent: " << cprint(currentParent) << std::endl;
-
     // Base case: found the new root's parent
     if (currentParent->getRightChild()->getRightChild() == NULL)
     {
-        std::cout << "\tBase case: found the new root's parent" << std::endl;
         Node *&replaceRef = currentParent->getRightChildRef();
         swapNodes(replaceRef, rmvNodeRef); // Swap rmvNode with replacement node
         deleteRmvNode(replaceRef);         // Once rmvNode is in replacement location, it can be safely deleted
-        if (currentParent == NULL)
-        {
-            std::cout << "currentParent after base case is NULL" << std::endl;
-        }
     }
     else
     {
         // Recurse
-        std::cout << "\tRecursing" << std::endl;
         result = removeSwap(rmvNodeRef, currentParent->getRightChildRef());
-
-        if (currentParent == NULL)
-        {
-            std::cout << "currentParent after recursing is NULL" << std::endl;
-        }
     }
 
     rebalance(currentParent);
@@ -357,7 +340,6 @@ Result AVL::removeSwap(Node *&rmvNodeRef, Node *&currentParent)
 
 void AVL::swapNodes(Node *&node, Node *&other)
 {
-    std::cout << "\tswapNodes() - node " << cprint(node) << ", other " << cprint(other) << std::endl;
     // Save node's children
     Node *nodeL = node->getLeftChild();
     Node *nodeR = node->getRightChild();
@@ -372,8 +354,6 @@ void AVL::swapNodes(Node *&node, Node *&other)
     Node *nodePtr = node; // Save pointer, not ref
     node = other;
     other = nodePtr;
-
-    std::cout << "\tdone with swapNodes, refs are now: node " << cprint(node) << ", other " << cprint(other) << std::endl;
 }
 
 void AVL::deleteRmvNode(Node *&rmvNodeRef)
@@ -403,7 +383,6 @@ Result AVL::rebalance(Node *&localRoot)
     }
     updateHeight(localRoot);
 
-    std::cout << "\trebalance() - localRoot: " << cprint(localRoot) << std::endl;
     int oldHeight = localRoot->getHeight();
     if (localRoot->getBalance() >= 2)
     {
@@ -439,7 +418,6 @@ Result AVL::rebalance(Node *&localRoot)
  */
 void AVL::rotateLeft(Node *&pivot)
 {
-    std::cout << "\trotateLeft()" << std::endl;
     Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
 
     Node *right = origin->getRightChild();
@@ -463,7 +441,6 @@ void AVL::rotateLeft(Node *&pivot)
  */
 void AVL::rotateRight(Node *&pivot)
 {
-    std::cout << "\trotateRight()" << std::endl;
     Node *origin = pivot; // Pointer to the pivot node, not a ref to the pivot location
 
     Node *left = origin->getLeftChild();
