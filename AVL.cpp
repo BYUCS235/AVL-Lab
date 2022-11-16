@@ -267,35 +267,40 @@ void AVL::removeNode(Node *&rmvNodeRef)
     }
 }
 
-/**
- * @brief Remove a node with two children and update its subtree.
- * Removes the local root at the given reference pointer and updates the pointer to the new local root.
- * Assumes rmvNodeRef and both of its children are non-NULL.
- *
- * @param rmvNodeRef A pointer reference to the node to remove.
- */
-void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
-{
-    Node *left = rmvNodeRef->getLeftChild();
-    Node *right = rmvNodeRef->getRightChild();
+// /**
+//  * @brief Remove a node with two children and update its subtree.
+//  * Removes the local root at the given reference pointer and updates the pointer to the new local root.
+//  * Assumes rmvNodeRef and both of its children are non-NULL.
+//  *
+//  * @param rmvNodeRef A pointer reference to the node to remove.
+//  */
+// void AVL::removeNodeWith2Children(Node *&rmvNodeRef)
+// {
+//     Node *left = rmvNodeRef->getLeftChild();
+//     Node *right = rmvNodeRef->getRightChild();
 
-    if (left->getRightChild() == NULL)
-    {
-        // Case 1: left has no right child
+//     if (left->getRightChild() == NULL)
+//     {
+//         // Case 1: left has no right child
 
-        Node *rmvNode = rmvNodeRef;
-        rmvNodeRef = left;
-        rmvNodeRef->setRightChild(right);
-        delete rmvNode;
-    }
-    else
-    {
-        // Case 2: left does have a right child
-        removeSwap(rmvNodeRef, rmvNodeRef->getLeftChildRef());
-    }
+//         Node *rmvNode = rmvNodeRef;
+//         rmvNodeRef = left;
+//         rmvNodeRef->setRightChild(right);
+//         delete rmvNode;
 
-    rebalance(rmvNodeRef);
-}
+//         if (left != NULL)
+//         {
+//             rebalance(left);
+//         }
+//     }
+//     else
+//     {
+//         // Case 2: left does have a right child
+//         removeSwap(rmvNodeRef, rmvNodeRef->getLeftChildRef());
+//     }
+
+//     rebalance(rmvNodeRef);
+// }
 
 std::string cprint(Node *node)
 {
